@@ -1,120 +1,120 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <title>WhatsApp</title>
+  <title>Lucky OS</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <style>
     :root {
-      --bg-dark: #0b141a;
-      --card-bg: #111b21;
-      --panel-header: #202c33;
-      --border-color: #222d34;
-      --accent-green: #00a884;
-      --accent-blue: #53bdeb;
-      --text-main: #e9edef;
-      --text-muted: #8696a0;
-      --msg-sent: #005c4b;
-      --msg-received: #202c33;
+      --bg-dark: #090e15;
+      --card-bg: #121922;
+      --panel-header: #19222c;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-cyan: #00d2ff;
+      --accent-blue: #0088cc;
+      --accent-gradient: linear-gradient(135deg, #0088cc, #00d2ff);
       --story-gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      --text-main: #ffffff;
+      --text-muted: #8292a2;
+      --msg-sent: linear-gradient(135deg, #1d6fa5, #0088cc);
+      --msg-received: #1b2531;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* Strict Auth Overlay */
+    /* Auth Screen */
     .auth-overlay { position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-    .auth-card { background: var(--card-bg); border: 1px solid var(--border-color); width: 100%; max-width: 360px; padding: 26px; border-radius: 16px; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,0.8); }
-    .auth-logo { width: 64px; height: 64px; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; color: #fff; }
-    .auth-input { width: 100%; background: #2a3942; border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 8px; color: #fff; margin-top: 10px; outline: none; font-size: 14px; }
-    .auth-btn { width: 100%; padding: 13px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; background: var(--accent-green); color: #fff; }
+    .auth-card { background: var(--card-bg); border: 1px solid var(--border-color); width: 100%; max-width: 360px; padding: 26px; border-radius: 20px; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,0.8); }
+    .auth-logo { width: 68px; height: 68px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; color: #fff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
+    .auth-input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 10px; color: #fff; margin-top: 10px; outline: none; font-size: 14px; }
+    .auth-btn { width: 100%; padding: 13px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; background: var(--accent-gradient); color: #fff; }
 
-    /* WhatsApp Header */
-    .wa-header { background: var(--panel-header); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
-    .wa-title { font-size: 20px; font-weight: 700; color: var(--text-muted); }
-    .wa-actions { display: flex; gap: 20px; font-size: 18px; color: var(--text-muted); position: relative; }
-    .wa-actions i { cursor: pointer; }
+    /* Main Header */
+    .app-header { background: var(--panel-header); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+    .app-brand { font-size: 20px; font-weight: 700; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+    .app-actions { display: flex; gap: 18px; font-size: 18px; color: var(--text-muted); position: relative; }
+    .app-actions i { cursor: pointer; }
 
-    /* Top Dropdown Menu */
-    .dropdown-menu { display: none; position: absolute; top: 34px; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); z-index: 200; }
+    /* Dropdown */
+    .dropdown-menu { display: none; position: absolute; top: 32px; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); z-index: 200; }
     .dropdown-item { padding: 12px 16px; font-size: 14px; color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 10px; }
-    .dropdown-item:active { background: var(--panel-header); }
+    .dropdown-item:active { background: rgba(255,255,255,0.05); }
 
-    /* Search Bar */
-    .search-box-wrap { padding: 8px 14px; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
-    .search-input-box { background: var(--panel-header); border-radius: 8px; display: flex; align-items: center; padding: 6px 12px; gap: 10px; }
-    .search-input-box i { color: var(--text-muted); font-size: 13px; }
-    .search-input-box input { border: none; background: transparent; color: #fff; outline: none; width: 100%; font-size: 13px; }
+    /* Search */
+    .search-wrap { padding: 8px 14px; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+    .search-box { background: var(--panel-header); border-radius: 10px; display: flex; align-items: center; padding: 8px 12px; gap: 10px; border: 1px solid var(--border-color); }
+    .search-box i { color: var(--text-muted); font-size: 13px; }
+    .search-box input { border: none; background: transparent; color: #fff; outline: none; width: 100%; font-size: 13px; }
 
     /* Views */
     .view-content { flex: 1; overflow-y: auto; display: none; }
     .view-content.active { display: block; }
 
-    /* Chats List */
-    .chat-row { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
-    .chat-row:active { background: var(--panel-header); }
+    /* Chat List */
+    .chat-row { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; }
+    .chat-row:active { background: rgba(255,255,255,0.03); }
     .avatar-box { position: relative; width: 50px; height: 50px; }
-    .avatar-img { width: 100%; height: 100%; border-radius: 50%; background: #6b7c85; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; }
-    .online-indicator { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: #00a884; border-radius: 50%; border: 2px solid var(--bg-dark); }
+    .avatar-img { width: 100%; height: 100%; border-radius: 50%; background: #223040; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; border: 1px solid var(--border-color); }
+    .online-indicator { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: #00e676; border-radius: 50%; border: 2px solid var(--bg-dark); }
     .chat-info { flex: 1; min-width: 0; }
     .chat-info-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
-    .chat-name { font-size: 16px; font-weight: 600; color: var(--text-main); }
+    .chat-name { font-size: 15px; font-weight: 600; color: var(--text-main); }
     .chat-time { font-size: 11px; color: var(--text-muted); }
     .chat-subtext { font-size: 13px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* Status Tab */
+    /* Status Section */
     .status-section { padding: 16px; }
     .my-status-box { display: flex; align-items: center; gap: 14px; cursor: pointer; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); }
-    .status-ring-add { width: 54px; height: 54px; border-radius: 50%; border: 2px dashed var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-green); }
+    .status-ring-add { width: 54px; height: 54px; border-radius: 50%; border: 2px dashed var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-cyan); }
     .recent-updates-title { font-size: 12px; font-weight: 600; color: var(--text-muted); margin: 16px 0 10px; text-transform: uppercase; }
     .status-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; cursor: pointer; }
     .status-ring { width: 54px; height: 54px; border-radius: 50%; padding: 2px; background: var(--story-gradient); display: flex; align-items: center; justify-content: center; }
     .status-ring img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
-    /* Settings Screen */
+    /* Settings View */
     .settings-profile-card { display: flex; align-items: center; gap: 16px; padding: 18px 16px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); }
-    .settings-avatar { width: 62px; height: 62px; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; color: #fff; }
+    .settings-avatar { width: 62px; height: 62px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; color: #fff; }
     .settings-item { display: flex; align-items: center; gap: 18px; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; }
     .settings-item i { font-size: 20px; color: var(--text-muted); width: 24px; text-align: center; }
     .settings-item-title { font-size: 15px; color: var(--text-main); font-weight: 500; }
     .settings-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-    /* Fullscreen Chat Window */
+    /* Fullscreen Conversation */
     .conversation-screen { position: fixed; inset: 0; background: var(--bg-dark); z-index: 500; display: none; flex-direction: column; }
     .conversation-screen.active { display: flex; }
     .chat-header-bar { background: var(--panel-header); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
-    .chat-messages-container { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: #0b141a; }
-    .msg-bubble { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 1.4; position: relative; word-wrap: break-word; }
-    .msg-bubble.sent { background: var(--msg-sent); align-self: flex-end; border-top-right-radius: 0; }
-    .msg-bubble.received { background: var(--msg-received); align-self: flex-start; border-top-left-radius: 0; }
-    .msg-bubble.ai { background: var(--msg-received); align-self: flex-start; border-top-left-radius: 0; }
-    .msg-time-ticks { font-size: 10px; color: var(--text-muted); float: right; margin-top: 4px; margin-left: 8px; display: flex; align-items: center; gap: 3px; }
-    .blue-tick { color: var(--accent-blue); }
-    .sticker-msg { font-size: 40px; background: transparent !important; padding: 0 !important; }
+    .chat-messages-container { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: radial-gradient(circle at top right, #111a24, var(--bg-dark)); }
+    .msg-bubble { max-width: 80%; padding: 9px 13px; border-radius: 14px; font-size: 14px; line-height: 1.45; position: relative; word-wrap: break-word; }
+    .msg-bubble.sent { background: var(--msg-sent); align-self: flex-end; border-bottom-right-radius: 2px; }
+    .msg-bubble.received { background: var(--msg-received); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
+    .msg-bubble.ai { background: rgba(0, 136, 204, 0.18); border: 1px solid rgba(0, 210, 255, 0.3); align-self: flex-start; border-bottom-left-radius: 2px; }
+    .msg-time-ticks { font-size: 10px; color: rgba(255,255,255,0.6); float: right; margin-top: 5px; margin-left: 8px; display: flex; align-items: center; gap: 3px; }
+    .blue-tick { color: var(--accent-cyan); }
+    .sticker-msg { font-size: 40px; background: transparent !important; border: none !important; padding: 0 !important; }
 
     /* Input Bar */
-    .wa-input-bar { background: var(--panel-header); padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
-    .wa-field-box { flex: 1; background: #2a3942; border-radius: 20px; display: flex; align-items: center; padding: 0 12px; gap: 8px; }
-    .wa-field-box input { flex: 1; background: transparent; border: none; outline: none; color: #fff; padding: 9px 0; font-size: 14px; }
-    .send-circle-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--accent-green); border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
+    .chat-input-bar { background: var(--panel-header); padding: 8px 12px; display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--border-color); }
+    .field-box { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 24px; display: flex; align-items: center; padding: 0 14px; gap: 8px; }
+    .field-box input { flex: 1; background: transparent; border: none; outline: none; color: #fff; padding: 10px 0; font-size: 14px; }
+    .send-circle-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-gradient); border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
 
-    /* Bottom Navigation Tabs */
+    /* Bottom Navigation */
     .bottom-nav { background: var(--panel-header); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; }
     .nav-tab { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; cursor: pointer; flex: 1; }
     .nav-tab i { font-size: 18px; }
-    .nav-tab.active { color: var(--accent-green); }
+    .nav-tab.active { color: var(--accent-cyan); }
 
-    /* Stickers */
-    .sticker-drawer { display: none; background: #111b21; padding: 12px; border-top: 1px solid var(--border-color); grid-template-columns: repeat(6, 1fr); gap: 12px; text-align: center; font-size: 26px; }
+    /* Sticker Drawer */
+    .sticker-drawer { display: none; background: var(--card-bg); padding: 12px; border-top: 1px solid var(--border-color); grid-template-columns: repeat(6, 1fr); gap: 12px; text-align: center; font-size: 26px; }
 
-    /* Calling Overlay */
-    .call-overlay { display: none; position: fixed; inset: 0; background: #0b141a; z-index: 1000; flex-direction: column; align-items: center; justify-content: space-between; padding: 60px 20px 40px; }
-    .call-end-btn { width: 60px; height: 60px; border-radius: 50%; background: #ea0038; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+    /* Call Overlay */
+    .call-overlay { display: none; position: fixed; inset: 0; background: rgba(9, 14, 21, 0.98); z-index: 1000; flex-direction: column; align-items: center; justify-content: space-between; padding: 60px 20px 40px; }
+    .call-end-btn { width: 62px; height: 62px; border-radius: 50%; background: #ea0038; border: none; color: #fff; font-size: 24px; cursor: pointer; }
 
     /* Fullscreen Story Viewer */
     .story-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 800; flex-direction: column; align-items: center; justify-content: center; }
@@ -126,35 +126,34 @@
 
     /* Add Contact Modal */
     .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 600; align-items: center; justify-content: center; padding: 20px; }
-    .modal-box { background: var(--card-bg); border: 1px solid var(--border-color); width: 100%; max-width: 340px; border-radius: 12px; padding: 20px; text-align: center; }
+    .modal-box { background: var(--card-bg); border: 1px solid var(--border-color); width: 100%; max-width: 340px; border-radius: 14px; padding: 20px; text-align: center; }
   </style>
 </head>
 <body>
 
-  <!-- Strict Login Modal -->
+  <!-- Mandatory Login -->
   <div class="auth-overlay" id="authScreen">
     <div class="auth-card">
-      <div class="auth-logo"><i class="fa-solid fa-lock"></i></div>
-      <h3 style="margin-bottom: 6px;">WhatsApp</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Fast, Simple & Secure Messaging</p>
+      <div class="auth-logo"><i class="fa-solid fa-paper-plane"></i></div>
+      <h3 style="margin-bottom: 6px;">Lucky OS</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Cloud-Synchronized Private Network</p>
       
-      <input type="text" id="loginName" class="auth-input" placeholder="Aapka Naam">
+      <input type="text" id="loginName" class="auth-input" placeholder="Enter Full Name">
       <input type="tel" id="loginPhone" class="auth-input" placeholder="Mobile Number (+91...)">
       
       <button class="auth-btn" onclick="submitUserLogin()">
-        <i class="fa-solid fa-arrow-right"></i> Agree & Continue
+        <i class="fa-solid fa-arrow-right"></i> Launch Lucky OS
       </button>
     </div>
   </div>
 
-  <!-- WhatsApp Top Header -->
-  <div class="wa-header">
-    <div class="wa-title">WhatsApp</div>
-    <div class="wa-actions">
+  <!-- Header -->
+  <div class="app-header">
+    <div class="app-brand"><i class="fa-solid fa-paper-plane"></i> Lucky OS</div>
+    <div class="app-actions">
       <i class="fa-solid fa-user-plus" onclick="openAddFriendModal()" title="Add Contact"></i>
-      <i class="fa-solid fa-ellipsis-vertical" onclick="toggleDropdownMenu()" title="Menu"></i>
+      <i class="fa-solid fa-ellipsis-vertical" onclick="toggleDropdownMenu()" title="Options"></i>
       
-      <!-- 3-Dots Dropdown Menu -->
       <div class="dropdown-menu" id="dropdownMenu">
         <div class="dropdown-item" onclick="openSettingsTab()"><i class="fa-solid fa-gear"></i> Settings</div>
       </div>
@@ -162,28 +161,28 @@
   </div>
 
   <!-- Search -->
-  <div class="search-box-wrap">
-    <div class="search-input-box">
+  <div class="search-wrap">
+    <div class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="searchInput" placeholder="Search..." onkeyup="filterUsers()">
+      <input type="text" id="searchInput" placeholder="Search chats or numbers..." onkeyup="filterUsers()">
     </div>
   </div>
 
   <!-- VIEW 1: CHATS TAB -->
   <div class="view-content active" id="chatsView">
     <div id="chatListContainer">
-      <!-- Lucky AI Card (Clean Look) -->
+      <!-- Lucky AI Card -->
       <div class="chat-row" onclick="openDirectChat('Lucky AI', true, '')" data-search="lucky ai">
         <div class="avatar-box">
-          <div class="avatar-img" style="background: var(--accent-green);"><i class="fa-solid fa-robot"></i></div>
+          <div class="avatar-img" style="background: var(--accent-gradient);"><i class="fa-solid fa-robot"></i></div>
           <div class="online-indicator"></div>
         </div>
         <div class="chat-info">
           <div class="chat-info-top">
-            <span class="chat-name">Lucky AI</span>
+            <span class="chat-name">Lucky AI <i class="fa-solid fa-circle-check" style="color: var(--accent-cyan); font-size: 12px;"></i></span>
             <span class="chat-time">Online</span>
           </div>
-          <div class="chat-subtext">Hey there! How can I help you today?</div>
+          <div class="chat-subtext">Online Assistant • Ask me anything!</div>
         </div>
       </div>
     </div>
@@ -196,7 +195,7 @@
         <div class="status-ring-add"><i class="fa-solid fa-plus"></i></div>
         <div>
           <h4 style="font-size: 15px;">My Status</h4>
-          <span style="font-size: 12px; color: var(--text-muted);">Tap to add status update</span>
+          <span style="font-size: 12px; color: var(--text-muted);">Tap to add image & song</span>
         </div>
       </div>
 
@@ -207,9 +206,9 @@
 
   <!-- VIEW 3: CALLS TAB -->
   <div class="view-content" id="callsView">
-    <div style="padding: 30px 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
-      <i class="fa-solid fa-phone" style="font-size: 34px; margin-bottom: 12px; display: block; color: var(--accent-green);"></i>
-      To start a call, select a contact and tap the call button.
+    <div style="padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+      <i class="fa-solid fa-phone" style="font-size: 34px; margin-bottom: 12px; display: block; color: var(--accent-cyan);"></i>
+      Open any direct chat to make high quality Audio & Video calls.
     </div>
   </div>
 
@@ -224,10 +223,10 @@
     </div>
 
     <div class="settings-item">
-      <i class="fa-solid fa-key"></i>
+      <i class="fa-solid fa-shield-halved"></i>
       <div>
-        <div class="settings-item-title">Account</div>
-        <div class="settings-item-sub">Security notifications, change number</div>
+        <div class="settings-item-title">Account Security</div>
+        <div class="settings-item-sub">Cloud encryption, database sync</div>
       </div>
     </div>
 
@@ -235,31 +234,15 @@
       <i class="fa-solid fa-lock"></i>
       <div>
         <div class="settings-item-title">Privacy</div>
-        <div class="settings-item-sub">Block contacts, disappearing messages</div>
-      </div>
-    </div>
-
-    <div class="settings-item">
-      <i class="fa-solid fa-message"></i>
-      <div>
-        <div class="settings-item-title">Chats</div>
-        <div class="settings-item-sub">Theme, wallpapers, chat history</div>
-      </div>
-    </div>
-
-    <div class="settings-item">
-      <i class="fa-solid fa-bell"></i>
-      <div>
-        <div class="settings-item-title">Notifications</div>
-        <div class="settings-item-sub">Message, group & call tones</div>
+        <div class="settings-item-sub">Blocked users, permissions</div>
       </div>
     </div>
 
     <div class="settings-item" onclick="shareAppInviteLink()">
-      <i class="fa-solid fa-user-group" style="color: var(--accent-green);"></i>
+      <i class="fa-solid fa-user-group" style="color: var(--accent-cyan);"></i>
       <div>
-        <div class="settings-item-title" style="color: var(--accent-green); font-weight: 600;">Invite a friend</div>
-        <div class="settings-item-sub">Share invite link with contacts</div>
+        <div class="settings-item-title" style="color: var(--accent-cyan); font-weight: 600;">Invite Friends</div>
+        <div class="settings-item-sub">Share Lucky OS invite link</div>
       </div>
     </div>
   </div>
@@ -288,7 +271,7 @@
   <input type="file" id="chatMediaInput" accept="image/*,video/*" style="display: none;" onchange="handleChatMediaSelected(event)">
   <audio id="storyBgMusic" loop></audio>
 
-  <!-- FULLSCREEN CHAT SCREEN -->
+  <!-- FULLSCREEN CONVERSATION -->
   <div class="conversation-screen" id="activeChatScreen">
     <div class="chat-header-bar">
       <div style="display: flex; align-items: center; gap: 10px;">
@@ -299,7 +282,7 @@
         </div>
         <div>
           <h4 id="currentChatName" style="font-size: 15px;">User</h4>
-          <span id="currentChatStatus" style="font-size: 11px; color: var(--text-muted);">online</span>
+          <span id="currentChatStatus" style="font-size: 11px; color: var(--accent-cyan);">online</span>
         </div>
       </div>
       <div style="display: flex; gap: 18px; font-size: 17px; color: var(--text-muted);">
@@ -322,24 +305,24 @@
     </div>
 
     <!-- Input Bar -->
-    <div class="wa-input-bar">
+    <div class="chat-input-bar">
       <i class="fa-regular fa-face-smile" style="color: var(--text-muted); font-size: 20px; cursor: pointer;" onclick="toggleStickers()"></i>
       <i class="fa-solid fa-paperclip" style="color: var(--text-muted); font-size: 19px; cursor: pointer;" onclick="document.getElementById('chatMediaInput').click()"></i>
-      <div class="wa-field-box">
-        <input type="text" id="activeMsgInput" placeholder="Message" onkeydown="handleInputKey(event)">
+      <div class="field-box">
+        <input type="text" id="activeMsgInput" placeholder="Write a message..." onkeydown="handleInputKey(event)">
       </div>
       <button class="send-circle-btn" onclick="sendUserMessage()"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </div>
 
-  <!-- Live Calling Overlay -->
+  <!-- Call Overlay -->
   <div class="call-overlay" id="callOverlay">
     <div style="text-align: center;">
-      <div class="avatar-img" style="width: 100px; height: 100px; font-size: 40px; margin: 0 auto 16px; background: var(--accent-green);">
+      <div class="avatar-img" style="width: 100px; height: 100px; font-size: 40px; margin: 0 auto 16px; background: var(--accent-gradient);">
         <i class="fa-solid fa-user"></i>
       </div>
       <h2 id="callingUserName" style="font-size: 20px;">User</h2>
-      <p id="callingTypeStatus" style="font-size: 13px; color: var(--accent-green); margin-top: 6px;">Calling...</p>
+      <p id="callingTypeStatus" style="font-size: 13px; color: var(--accent-cyan); margin-top: 6px;">Connecting...</p>
     </div>
     <button class="call-end-btn" onclick="endCurrentCall()"><i class="fa-solid fa-phone-slash"></i></button>
   </div>
@@ -347,7 +330,7 @@
   <!-- Add Contact Modal -->
   <div class="modal-backdrop" id="addFriendModal">
     <div class="modal-box">
-      <h3 style="font-size: 16px; margin-bottom: 8px;">New Contact</h3>
+      <h3 style="font-size: 16px; margin-bottom: 8px;">Add New Contact</h3>
       <input type="text" id="friendNameInput" class="auth-input" placeholder="Name">
       <input type="tel" id="friendPhoneInput" class="auth-input" placeholder="Phone Number">
       <button class="auth-btn" onclick="confirmAddFriend()">Add Contact</button>
@@ -366,28 +349,29 @@
   </div>
 
   <script>
-    // Firebase Config
+    // Firebase Database Setup
     const firebaseConfig = {
       apiKey: "AIzaSyAcioeGQ3OMZ-yzA5yGnhJX0QdxblP45Vk",
       authDomain: "lucky-messenger-fbead.firebaseapp.com",
+      databaseURL: "https://lucky-messenger-fbead-default-rtdb.firebaseio.com",
       projectId: "lucky-messenger-fbead",
       storageBucket: "lucky-messenger-fbead.firebasestorage.app",
       messagingSenderId: "373398579211",
       appId: "1:373398579211:web:7e1433f5c60e75ad88bf0e",
-      measurementId: "G-VEGVHPWFGH",
-      databaseURL: "https://lucky-messenger-fbead-default-rtdb.firebaseio.com"
+      measurementId: "G-VEGVHPWFGH"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // Direct Gemini AI Engine
     const GEMINI_API_KEY = "AIzaSyAzX-bCMl3GewqIHUr3gaCQJmchDW0FKs4";
     let currentUser = null;
     let activeChat = null;
     let storyTimer = null;
     let activeMediaStream = null;
 
-    // --- NAVIGATION TABS ---
+    // --- TABS & NAVIGATION ---
     function switchNavTab(viewId, tabElement) {
       document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -407,16 +391,16 @@
     }
 
     window.addEventListener('click', (e) => {
-      if (!e.target.closest('.wa-actions')) {
+      if (!e.target.closest('.app-actions')) {
         document.getElementById('dropdownMenu').style.display = 'none';
       }
     });
 
-    // --- LOGIN GATEWAY ---
+    // --- LOGIN AUTHENTICATION ---
     function submitUserLogin() {
       const name = document.getElementById('loginName').value.trim();
       const phone = document.getElementById('loginPhone').value.trim();
-      if (!name || !phone) return alert("Kripya Naam aur Mobile Number darj karein!");
+      if (!name || !phone) return alert("कृपया नाम और मोबाइल नंबर दोनों दर्ज करें!");
 
       currentUser = { name, phone };
       localStorage.setItem('lucky_session', JSON.stringify(currentUser));
@@ -461,16 +445,12 @@
       }
     }
 
-    // --- CLEAN WELCOME MESSAGE ---
+    // --- AI WELCOME GREETING ---
     async function sendAIWelcomeGreeting() {
       const cleanPhone = currentUser.phone.replace(/[^0-9]/g, '');
       const aiRoomId = 'ai_' + cleanPhone;
 
-      const prompt = `
-        User ka naam "${currentUser.name}" hai. Tum Lucky AI ho, created by Lucky A.S.
-        WhatsApp user ki tarah ek normal aur friendly message bhejo (jaise: "Hey [Naam]! Welcome, kaise ho aap?").
-        Koi technical baat ya rule mat samjhao.
-      `;
+      const prompt = `User ka naam "${currentUser.name}" hai. Tum Lucky AI ho, created by Lucky A.S on Lucky OS. Ek natural, friendly chat style message bhejo jaise: "Hey ${currentUser.name}! Welcome to Lucky OS 🚀 Kaise ho aap?"`;
 
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
@@ -479,7 +459,7 @@
           body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] })
         });
         const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || `Hey ${currentUser.name}! Welcome, kaise ho aap?`;
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || `Hey ${currentUser.name}! Welcome to Lucky OS 🚀 Kaise ho aap?`;
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         db.ref('messages/' + aiRoomId).push({
@@ -492,7 +472,7 @@
       } catch (e) {}
     }
 
-    // --- LIVE FIREBASE SYNC ---
+    // --- FIREBASE LIVE SYNC ---
     function initLiveFirebase() {
       db.ref('users').on('value', snap => {
         const users = snap.val() || {};
@@ -552,19 +532,19 @@
         <div class="status-ring"><img src="${imgUrl}"></div>
         <div>
           <h4 style="font-size: 15px;">${sender}</h4>
-          <span style="font-size: 12px; color: var(--text-muted);">${audioUrl ? '🎵 ' + (songTitle || 'Music') : 'Just now'}</span>
+          <span style="font-size: 12px; color: var(--text-muted);">${audioUrl ? '🎵 ' + (songTitle || 'Music Track') : 'Just now'}</span>
         </div>
       `;
       container.appendChild(row);
     }
 
-    // --- CHAT CONVERSATION ---
+    // --- CONVERSATION & INSTANT AI ENGINE ---
     function openDirectChat(name, isAI = false, phone = '') {
       activeChat = { name, isAI, phone };
       document.getElementById('activeChatScreen').classList.add('active');
       document.getElementById('currentChatName').innerText = name;
       document.getElementById('currentChatAvatar').innerText = name[0].toUpperCase();
-      document.getElementById('currentChatStatus').innerText = "online";
+      document.getElementById('currentChatStatus').innerText = isAI ? "AI Assistant" : "online";
       document.getElementById('stickerDrawer').style.display = 'none';
 
       loadCloudMessages();
@@ -627,7 +607,42 @@
       });
 
       input.value = '';
-      if (activeChat.isAI) callLuckyAI(text, roomId);
+
+      if (activeChat.isAI) {
+        callLuckyAI(text, roomId);
+      }
+    }
+
+    async function callLuckyAI(userText, roomId) {
+      const prompt = `Tumhara naam "Lucky AI" hai. Developer aur creator: Lucky A.S (लकी एएस) on Lucky OS platform. Normal, intelligent aur fast WhatsApp/Telegram style friend ki tarah chat karo. Har sawaal ka natural aur clear reply do.`;
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: `${prompt}\n\nUser: ${userText}` }] }] })
+        });
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "हाँ बोलो, मैं सुन रहा हूँ!";
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        db.ref('messages/' + roomId).push({
+          sender: "Lucky AI",
+          senderPhone: "AI_BOT",
+          text: reply.replace(/\n/g, '<br>'),
+          time: time,
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+      } catch (e) {
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        db.ref('messages/' + roomId).push({
+          sender: "Lucky AI",
+          senderPhone: "AI_BOT",
+          text: "Lucky OS AI online है! पूछिए क्या मदद चाहिए?",
+          time: time,
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
     }
 
     function sendSticker(char) {
@@ -652,35 +667,7 @@
       d.style.display = (d.style.display === 'grid') ? 'none' : 'grid';
     }
 
-    // --- AI RESPONSE ENGINE ---
-    async function callLuckyAI(userText, roomId) {
-      const prompt = `
-        Tumhara naam "Lucky AI" hai. Developer/Creator: Lucky A.S (लकी एएस).
-        Normal, natural WhatsApp friend ki tarah chat karo.
-        Agar koi creator ke baare me pooche tabhi Lucky A.S ka zikr karo, warna normal baat karo.
-      `;
-
-      try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: `${prompt}\n\nUser: ${userText}` }] }] })
-        });
-        const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Haan bolo, sab badhiya?";
-        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        db.ref('messages/' + roomId).push({
-          sender: "Lucky AI",
-          senderPhone: "AI_BOT",
-          text: reply.replace(/\n/g, '<br>'),
-          time: time,
-          timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
-      } catch (e) {}
-    }
-
-    // --- STATUS STORIES ---
+    // --- STATUS STORIES WITH DIRECT MUSIC ---
     function startStoryProcess() {
       document.getElementById('storyImgInput').click();
     }
@@ -703,8 +690,8 @@
       let songUrl = null;
       let songTitle = "";
       if (wantOnlineSong) {
-        songUrl = prompt("Audio Link (MP3):", "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3");
-        songTitle = prompt("Song Title:", "Music") || "Music";
+        songUrl = prompt("Audio MP3 Link paste karein:", "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3");
+        songTitle = prompt("Song Title:", "Soundtrack") || "Music Track";
       }
 
       db.ref('stories').push({
@@ -724,7 +711,7 @@
 
       if (audioUrl) {
         musicTag.style.display = 'flex';
-        document.getElementById('storySongName').innerText = songName || 'Music';
+        document.getElementById('storySongName').innerText = songName || 'Soundtrack';
         audioEl.src = audioUrl;
         audioEl.play().catch(() => {});
       } else {
@@ -755,7 +742,7 @@
       document.getElementById('storyViewer').style.display = 'none';
     }
 
-    // --- CALLS & LOCATION ---
+    // --- CALLS & GPS ---
     async function requestPermissions() {
       try {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -775,7 +762,7 @@
         document.getElementById('callingTypeStatus').innerText = `${type} Call (Connecting...)`;
         document.getElementById('callOverlay').style.display = 'flex';
       } catch (err) {
-        alert("Microphone/Camera permission allow karein!");
+        alert("Camera aur Microphone access allow karein!");
       }
     }
 
@@ -798,24 +785,24 @@
           sender: currentUser.name,
           senderPhone: currentUser.phone,
           receiver: activeChat.name,
-          text: `📍 <b>Live Location</b><br><a href="${mapLink}" target="_blank" style="color:#53bdeb;">Open Map</a>`,
+          text: `📍 <b>Live Location</b><br><a href="${mapLink}" target="_blank" style="color:var(--accent-cyan);">Open in Maps</a>`,
           time: time,
           timestamp: firebase.database.ServerValue.TIMESTAMP
         });
       }, () => alert("Location permission allow karein."));
     }
 
-    // --- INVITE A FRIEND ---
+    // --- INVITE SYSTEM ---
     function shareAppInviteLink() {
       if (!currentUser) return;
       const url = window.location.origin + window.location.pathname;
       const inviteUrl = `${url}?invite=${currentUser.phone.replace(/[^0-9]/g, '')}`;
 
       if (navigator.share) {
-        navigator.share({ title: "Invite", text: "Chat with me on WhatsApp:", url: inviteUrl });
+        navigator.share({ title: "Lucky OS", text: "Chat with me on Lucky OS:", url: inviteUrl });
       } else {
         navigator.clipboard.writeText(inviteUrl);
-        alert("Invite link copied to clipboard!");
+        alert("Invite link clipboard par copy ho gaya!");
       }
     }
 
@@ -825,7 +812,7 @@
     function confirmAddFriend() {
       const name = document.getElementById('friendNameInput').value.trim();
       const phone = document.getElementById('friendPhoneInput').value.trim();
-      if (!name || !phone) return alert("Naam aur phone number dono daalein!");
+      if (!name || !phone) return alert("नाम और फोन नंबर दोनों दर्ज करें!");
 
       const cleanPhone = phone.replace(/[^0-9]/g, '');
       db.ref('users/' + cleanPhone).set({
@@ -849,4 +836,4 @@
     }
   </script>
 </body>
-</html>
+          </html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Telegram Cloud Messenger</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0e1621; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* Top Navigation Header */
+    .chat-header { background-color: #17212b; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #111923; }
+    .user-info { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #3390ec, #5eb5f7); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .details h4 { font-size: 15px; font-weight: 600; }
+    .details span { font-size: 12px; color: #7f91a4; }
+    .header-icons { display: flex; gap: 18px; font-size: 18px; color: #7f91a4; }
+    .header-icons i { cursor: pointer; }
+
+    /* Chat Messages Window */
+    .chat-box { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0e1621; }
+    .msg { max-width: 82%; padding: 8px 12px; border-radius: 12px; position: relative; font-size: 14px; line-height: 1.4; word-wrap: break-word; cursor: pointer; }
+    .received { background-color: #182533; align-self: flex-start; border-bottom-left-radius: 2px; }
+    .sender-tag { font-size: 11px; font-weight: bold; color: #5eb5f7; margin-bottom: 2px; display: block; }
+    .sent { background-color: #2b5278; align-self: flex-end; border-bottom-right-radius: 2px; }
+    .msg-meta { font-size: 10px; color: #8fa0b5; display: inline-flex; align-items: center; gap: 4px; float: right; margin-top: 4px; margin-left: 8px; }
+    .double-tick { color: #5eb5f7; }
+    .deleted-text { font-style: italic; color: #8fa0b5; font-size: 13px; }
+
+    /* Media Styling */
+    .msg-media { max-width: 100%; border-radius: 8px; margin-top: 5px; display: block; }
+    audio { width: 220px; height: 35px; margin-top: 5px; }
+
+    /* Attachment Drawer */
+    .attach-menu { display: none; background: #17212b; border-top: 1px solid #242f3d; padding: 12px; grid-template-columns: repeat(4, 1fr); text-align: center; gap: 10px; }
+    .attach-item { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #ccc; cursor: pointer; }
+    .attach-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
+
+    /* Bottom Input Bar */
+    .input-bar { background-color: #17212b; padding: 8px 10px; display: flex; align-items: center; gap: 10px; }
+    .action-btn { background: none; border: none; color: #7f91a4; font-size: 20px; cursor: pointer; }
+    .msg-input { flex: 1; background: #242f3d; border: none; outline: none; color: #fff; padding: 10px 14px; border-radius: 22px; font-size: 14px; }
+    .send-btn { width: 40px; height: 40px; border-radius: 50%; background: #3390ec; border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
+
+    /* Delete Action Sheet Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: flex-end; }
+    .delete-sheet { background: #17212b; width: 100%; border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .sheet-btn { background: #242f3d; color: #fff; border: none; padding: 12px; border-radius: 10px; font-size: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .sheet-btn.danger { color: #ff5252; }
+    .sheet-btn.cancel { background: transparent; justify-content: center; color: #7f91a4; }
+
+    /* Calling Overlay */
+    .call-overlay { display: none; position: fixed; inset: 0; background: rgba(14, 22, 33, 0.95); flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+    .call-status { font-size: 14px; color: #7f91a4; margin-top: 10px; }
+    .end-call-btn { margin-top: 40px; width: 60px; height: 60px; border-radius: 50%; background: #e53935; border: none; color: #fff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <div class="chat-header">
+    <div class="user-info">
+      <div class="avatar">S</div>
+      <div class="details">
+        <h4>Squad Group</h4>
+        <span>@lucky, @sumit (No numbers visible)</span>
+      </div>
+    </div>
+    <div class="header-icons">
+      <i class="fa-solid fa-phone" onclick="startCall('Audio')"></i>
+      <i class="fa-solid fa-video" onclick="startCall('Video')"></i>
+    </div>
+  </div>
+
+  <!-- Messages List -->
+  <div class="chat-box" id="chatBox">
+    <div class="msg received" onclick="openDeleteMenu(this, false)">
+      <span class="sender-tag">@sumit</span>
+      Bhai GitHub Pages par app live chal rahi hai bina kisi error ke! 🔥
+      <div class="msg-meta">10:45 AM</div>
+    </div>
+  </div>
+
+  <!-- Attachments Drawer -->
+  <div class="attach-menu" id="attachMenu">
+    <div class="attach-item" onclick="triggerFile('image/*')"><div class="attach-icon" style="background: #007aff;"><i class="fa-solid fa-image"></i></div><span>Photo</span></div>
+    <div class="attach-item" onclick="triggerFile('video/*')"><div class="attach-icon" style="background: #ff3366;"><i class="fa-solid fa-video"></i></div><span>Video</span></div>
+    <div class="attach-item" onclick="triggerFile('audio/*')"><div class="attach-icon" style="background: #e040fb;"><i class="fa-solid fa-music"></i></div><span>Song</span></div>
+    <div class="attach-item" onclick="sendLocation()"><div class="attach-icon" style="background: #00c853;"><i class="fa-solid fa-location-dot"></i></div><span>Location</span></div>
+  </div>
+  <input type="file" id="hiddenFileInput" style="display: none;" onchange="handleFileUpload(event)">
+
+  <!-- Input Bar -->
+  <div class="input-bar">
+    <button class="action-btn" onclick="toggleMenu()"><i class="fa-solid fa-paperclip"></i></button>
+    <input type="text" id="msgInput" class="msg-input" placeholder="Message..." onkeypress="handleKey(event)">
+    <button class="send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+
+  <!-- Delete Options Sheet -->
+  <div class="modal-overlay" id="deleteModal" onclick="closeDeleteMenu()">
+    <div class="delete-sheet" onclick="event.stopPropagation()">
+      <h4 style="font-size: 14px; color: #7f91a4; margin-bottom: 4px;">Delete message?</h4>
+      <button class="sheet-btn danger" id="delEveryoneBtn" onclick="deleteForEveryone()"><i class="fa-solid fa-trash-can"></i> Delete for Everyone</button>
+      <button class="sheet-btn" onclick="deleteForMe()"><i class="fa-solid fa-trash"></i> Delete for Me</button>
+      <button class="sheet-btn cancel" onclick="closeDeleteMenu()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Calling Screen -->
+  <div class="call-overlay" id="callOverlay">
+    <div class="avatar" style="width: 80px; height: 80px; font-size: 32px;">S</div>
+    <h3 style="margin-top: 15px;" id="callTitle">Calling Squad...</h3>
+    <span class="call-status">Connecting via WebRTC (P2P)...</span>
+    <button class="end-call-btn" onclick="endCall()"><i class="fa-solid fa-phone-slash"></i></button>
+  </div>
+
+  <script>
+    let activeMsgElement = null;
+
+    function toggleMenu() {
+      const menu = document.getElementById('attachMenu');
+      menu.style.display = (menu.style.display === 'grid') ? 'none' : 'grid';
+    }
+
+    function appendMessage(contentHtml) {
+      const chatBox = document.getElementById('chatBox');
+      const newMsg = document.createElement('div');
+      newMsg.className = 'msg sent';
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      newMsg.innerHTML = `<span class="content">${contentHtml}</span> <div class="msg-meta">${time} <i class="fa-solid fa-check-double double-tick"></i></div>`;
+      newMsg.onclick = function() { openDeleteMenu(this, true); };
+      chatBox.appendChild(newMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('msgInput');
+      const text = input.value.trim();
+      if (!text) return;
+      appendMessage(text);
+      input.value = '';
+    }
+
+    function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
+
+    function openDeleteMenu(msgElem, isSentByMe) {
+      activeMsgElement = msgElem;
+      document.getElementById('delEveryoneBtn').style.display = isSentByMe ? 'flex' : 'none';
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeDeleteMenu() {
+      document.getElementById('deleteModal').style.display = 'none';
+      activeMsgElement = null;
+    }
+
+    function deleteForMe() {
+      if (activeMsgElement) activeMsgElement.remove();
+      closeDeleteMenu();
+    }
+
+    function deleteForEveryone() {
+      if (activeMsgElement) {
+        activeMsgElement.innerHTML = `<span class="deleted-text"><i class="fa-solid fa-ban"></i> This message was deleted</span>`;
+        activeMsgElement.style.opacity = '0.6';
+      }
+      closeDeleteMenu();
+    }
+
+    function triggerFile(acceptType) {
+      const fileInput = document.getElementById('hiddenFileInput');
+      fileInput.accept = acceptType;
+      fileInput.click();
+      toggleMenu();
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const fileUrl = URL.createObjectURL(file);
+      let content = '';
+      if (file.type.startsWith('image/')) content = `<img src="${fileUrl}" class="msg-media">`;
+      else if (file.type.startsWith('video/')) content = `<video src="${fileUrl}" controls class="msg-media"></video>`;
+      else if (file.type.startsWith('audio/')) content = `🎵 <b>${file.name}</b><br><audio src="${fileUrl}" controls></audio>`;
+
+      appendMessage(content);
+      event.target.value = '';
+    }
+
+    function sendLocation() {
+      toggleMenu();
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const mapLink = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+          appendMessage(`📍 <b>Live Location</b><br><a href="${mapLink}" target="_blank" style="color: #5eb5f7;">Google Maps</a>`);
+        }, () => alert('Location permission denied!'));
+      }
+    }
+
+    function startCall(type) {
+      document.getElementById('callTitle').innerText = `${type} Call`;
+      document.getElementById('callOverlay').style.display = 'flex';
+    }
+
+    function endCall() {
+      document.getElementById('callOverlay').style.display = 'none';
+    }
+  </script>
+</body>
+  </html>

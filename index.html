@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Lucky Messenger</title>
+  <title>WhatsApp</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
@@ -13,246 +11,351 @@
 
   <style>
     :root {
-      --bg-dark: #080d14;
-      --card-bg: rgba(23, 33, 43, 0.75);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --accent-blue: #0088cc;
-      --accent-cyan: #00d2ff;
-      --accent-gradient: linear-gradient(135deg, #0088cc, #00d2ff);
+      --bg-dark: #0b141a;
+      --card-bg: #111b21;
+      --panel-header: #202c33;
+      --border-color: #222d34;
+      --accent-green: #00a884;
+      --accent-blue: #53bdeb;
+      --text-main: #e9edef;
+      --text-muted: #8696a0;
+      --msg-sent: #005c4b;
+      --msg-received: #202c33;
       --story-gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-      --text-main: #ffffff;
-      --text-muted: #8292a2;
-      --msg-sent: linear-gradient(135deg, #1d6fa5, #0088cc);
-      --msg-received: rgba(27, 39, 53, 0.85);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* Strict Auth Overlay (Zero Access Without Account) */
-    .auth-overlay { position: fixed; inset: 0; background: #080d14; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-    .auth-card { background: #141d27; border: 1px solid var(--glass-border); width: 100%; max-width: 360px; padding: 26px; border-radius: 20px; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,0.8); }
-    .auth-logo { width: 68px; height: 68px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; color: #fff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
-    .auth-input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 12px 14px; border-radius: 10px; color: #fff; margin-top: 10px; outline: none; font-size: 14px; }
-    .auth-btn { width: 100%; padding: 13px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; background: var(--accent-gradient); color: #fff; }
+    /* Strict Auth Overlay */
+    .auth-overlay { position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .auth-card { background: var(--card-bg); border: 1px solid var(--border-color); width: 100%; max-width: 360px; padding: 26px; border-radius: 16px; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,0.8); }
+    .auth-logo { width: 64px; height: 64px; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; color: #fff; }
+    .auth-input { width: 100%; background: #2a3942; border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 8px; color: #fff; margin-top: 10px; outline: none; font-size: 14px; }
+    .auth-btn { width: 100%; padding: 13px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; background: var(--accent-green); color: #fff; }
 
-    /* Header */
-    .top-bar { background: rgba(14, 22, 33, 0.85); backdrop-filter: blur(16px); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100; }
-    .brand-title { font-size: 20px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
-    .header-icons { display: flex; gap: 12px; }
-    .icon-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; color: var(--text-main); cursor: pointer; }
+    /* WhatsApp Header */
+    .wa-header { background: var(--panel-header); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+    .wa-title { font-size: 20px; font-weight: 700; color: var(--text-muted); }
+    .wa-actions { display: flex; gap: 20px; font-size: 18px; color: var(--text-muted); position: relative; }
+    .wa-actions i { cursor: pointer; }
 
-    /* Search */
-    .search-container { padding: 10px 16px; background: rgba(14, 22, 33, 0.5); }
-    .search-inner { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; align-items: center; padding: 0 14px; }
-    .search-inner i { color: var(--text-muted); font-size: 14px; }
-    .search-input { width: 100%; background: transparent; border: none; outline: none; color: #fff; padding: 10px; font-size: 13px; }
+    /* Top Dropdown Menu */
+    .dropdown-menu { display: none; position: absolute; top: 34px; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); z-index: 200; }
+    .dropdown-item { padding: 12px 16px; font-size: 14px; color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+    .dropdown-item:active { background: var(--panel-header); }
 
-    /* Stories */
-    .stories-tray { padding: 14px 16px; display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--glass-border); background: rgba(14, 22, 33, 0.3); }
-    .stories-tray::-webkit-scrollbar { display: none; }
-    .story-unit { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; min-width: 62px; }
-    .story-border { width: 62px; height: 62px; border-radius: 50%; padding: 2.5px; background: var(--story-gradient); display: flex; align-items: center; justify-content: center; }
-    .story-border.add-status { background: rgba(255, 255, 255, 0.1); border: 1.5px dashed var(--text-muted); }
-    .story-thumb { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #17212b; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid var(--bg-dark); }
-    .story-name { font-size: 11px; font-weight: 500; color: var(--text-muted); max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* Search Bar */
+    .search-box-wrap { padding: 8px 14px; background: var(--bg-dark); border-bottom: 1px solid var(--border-color); }
+    .search-input-box { background: var(--panel-header); border-radius: 8px; display: flex; align-items: center; padding: 6px 12px; gap: 10px; }
+    .search-input-box i { color: var(--text-muted); font-size: 13px; }
+    .search-input-box input { border: none; background: transparent; color: #fff; outline: none; width: 100%; font-size: 13px; }
 
-    /* Screen Management */
-    .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; }
-    .screen.active { display: flex; }
+    /* Views */
+    .view-content { flex: 1; overflow-y: auto; display: none; }
+    .view-content.active { display: block; }
 
-    /* Chat List */
-    .chat-scroll { flex: 1; overflow-y: auto; }
-    .chat-row { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); cursor: pointer; }
-    .avatar-wrap { position: relative; width: 50px; height: 50px; }
-    .user-avatar { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #1f2c3a, #2b3e52); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; }
-    .status-dot { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: #00e676; border-radius: 50%; border: 2px solid var(--bg-dark); }
-    .chat-details { flex: 1; min-width: 0; }
-    .chat-title-box { display: flex; justify-content: space-between; margin-bottom: 4px; }
-    .chat-name { font-size: 15px; font-weight: 600; color: #fff; }
+    /* Chats List */
+    .chat-row { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+    .chat-row:active { background: var(--panel-header); }
+    .avatar-box { position: relative; width: 50px; height: 50px; }
+    .avatar-img { width: 100%; height: 100%; border-radius: 50%; background: #6b7c85; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; }
+    .online-indicator { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: #00a884; border-radius: 50%; border: 2px solid var(--bg-dark); }
+    .chat-info { flex: 1; min-width: 0; }
+    .chat-info-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .chat-name { font-size: 16px; font-weight: 600; color: var(--text-main); }
     .chat-time { font-size: 11px; color: var(--text-muted); }
-    .chat-preview { font-size: 13px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .chat-subtext { font-size: 13px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* Conversation Screen */
-    .active-chat-header { background: rgba(14, 22, 33, 0.9); backdrop-filter: blur(16px); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--glass-border); }
-    .header-user-meta { display: flex; align-items: center; gap: 12px; }
-    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: radial-gradient(circle at top right, #0d1723, var(--bg-dark)); }
-    .bubble { max-width: 82%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.45; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.15); word-wrap: break-word; }
-    .bubble.sent { background: var(--msg-sent); align-self: flex-end; border-bottom-right-radius: 4px; }
-    .bubble.received { background: var(--msg-received); border: 1px solid var(--glass-border); align-self: flex-start; border-bottom-left-radius: 4px; }
-    .bubble.ai { background: rgba(15, 30, 46, 0.9); border: 1px solid rgba(0, 210, 255, 0.25); align-self: flex-start; border-bottom-left-radius: 4px; }
-    .bubble-meta { font-size: 10px; color: rgba(255, 255, 255, 0.6); float: right; margin-top: 6px; margin-left: 10px; }
-    .sticker-msg { font-size: 44px; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+    /* Status Tab */
+    .status-section { padding: 16px; }
+    .my-status-box { display: flex; align-items: center; gap: 14px; cursor: pointer; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); }
+    .status-ring-add { width: 54px; height: 54px; border-radius: 50%; border: 2px dashed var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-green); }
+    .recent-updates-title { font-size: 12px; font-weight: 600; color: var(--text-muted); margin: 16px 0 10px; text-transform: uppercase; }
+    .status-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; cursor: pointer; }
+    .status-ring { width: 54px; height: 54px; border-radius: 50%; padding: 2px; background: var(--story-gradient); display: flex; align-items: center; justify-content: center; }
+    .status-ring img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
-    /* Sticker Drawer */
-    .sticker-drawer { display: none; background: #141d27; padding: 12px; border-top: 1px solid var(--glass-border); grid-template-columns: repeat(6, 1fr); gap: 12px; text-align: center; font-size: 26px; }
-    .sticker-item { cursor: pointer; transition: transform 0.1s ease; }
-    .sticker-item:hover { transform: scale(1.2); }
+    /* Settings Screen */
+    .settings-profile-card { display: flex; align-items: center; gap: 16px; padding: 18px 16px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); }
+    .settings-avatar { width: 62px; height: 62px; border-radius: 50%; background: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; color: #fff; }
+    .settings-item { display: flex; align-items: center; gap: 18px; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; }
+    .settings-item i { font-size: 20px; color: var(--text-muted); width: 24px; text-align: center; }
+    .settings-item-title { font-size: 15px; color: var(--text-main); font-weight: 500; }
+    .settings-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Fullscreen Chat Window */
+    .conversation-screen { position: fixed; inset: 0; background: var(--bg-dark); z-index: 500; display: none; flex-direction: column; }
+    .conversation-screen.active { display: flex; }
+    .chat-header-bar { background: var(--panel-header); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+    .chat-messages-container { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: #0b141a; }
+    .msg-bubble { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 1.4; position: relative; word-wrap: break-word; }
+    .msg-bubble.sent { background: var(--msg-sent); align-self: flex-end; border-top-right-radius: 0; }
+    .msg-bubble.received { background: var(--msg-received); align-self: flex-start; border-top-left-radius: 0; }
+    .msg-bubble.ai { background: var(--msg-received); align-self: flex-start; border-top-left-radius: 0; }
+    .msg-time-ticks { font-size: 10px; color: var(--text-muted); float: right; margin-top: 4px; margin-left: 8px; display: flex; align-items: center; gap: 3px; }
+    .blue-tick { color: var(--accent-blue); }
+    .sticker-msg { font-size: 40px; background: transparent !important; padding: 0 !important; }
 
     /* Input Bar */
-    .chat-input-bar { background: rgba(14, 22, 33, 0.9); backdrop-filter: blur(16px); padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--glass-border); }
-    .field-wrap { flex: 1; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--glass-border); border-radius: 24px; display: flex; align-items: center; padding: 0 14px; gap: 8px; }
-    .chat-field { width: 100%; background: transparent; border: none; outline: none; color: #fff; padding: 11px 0; font-size: 14px; }
-    .view-once-toggle { width: 26px; height: 26px; border-radius: 50%; border: 1.5px dashed var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; }
-    .view-once-toggle.active { border-color: #00d2ff; color: #00d2ff; background: rgba(0, 210, 255, 0.15); }
-    .send-action { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-gradient); border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 17px; cursor: pointer; }
+    .wa-input-bar { background: var(--panel-header); padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+    .wa-field-box { flex: 1; background: #2a3942; border-radius: 20px; display: flex; align-items: center; padding: 0 12px; gap: 8px; }
+    .wa-field-box input { flex: 1; background: transparent; border: none; outline: none; color: #fff; padding: 9px 0; font-size: 14px; }
+    .send-circle-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--accent-green); border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
 
-    /* Calling Screen */
-    .call-overlay { display: none; position: fixed; inset: 0; background: rgba(8, 13, 20, 0.96); z-index: 1000; flex-direction: column; align-items: center; justify-content: space-between; padding: 60px 20px 40px; }
-    .call-avatar { width: 110px; height: 110px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 44px; margin-bottom: 20px; box-shadow: 0 0 30px rgba(0, 210, 255, 0.4); }
-    .end-call-btn { width: 64px; height: 64px; border-radius: 50%; background: #e53935; border: none; color: #fff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    /* Bottom Navigation Tabs */
+    .bottom-nav { background: var(--panel-header); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; }
+    .nav-tab { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; cursor: pointer; flex: 1; }
+    .nav-tab i { font-size: 18px; }
+    .nav-tab.active { color: var(--accent-green); }
 
-    /* Modals */
-    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 600; align-items: center; justify-content: center; padding: 20px; }
-    .modal-box { background: #141d27; border: 1px solid var(--glass-border); width: 100%; max-width: 340px; border-radius: 16px; padding: 20px; text-align: center; }
-    .custom-input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: #fff; padding: 10px; border-radius: 8px; margin: 8px 0; outline: none; }
-    .btn-submit { width: 100%; background: var(--accent-gradient); border: none; color: #fff; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    /* Stickers */
+    .sticker-drawer { display: none; background: #111b21; padding: 12px; border-top: 1px solid var(--border-color); grid-template-columns: repeat(6, 1fr); gap: 12px; text-align: center; font-size: 26px; }
 
-    /* Story Fullscreen */
+    /* Calling Overlay */
+    .call-overlay { display: none; position: fixed; inset: 0; background: #0b141a; z-index: 1000; flex-direction: column; align-items: center; justify-content: space-between; padding: 60px 20px 40px; }
+    .call-end-btn { width: 60px; height: 60px; border-radius: 50%; background: #ea0038; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+
+    /* Fullscreen Story Viewer */
     .story-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 800; flex-direction: column; align-items: center; justify-content: center; }
     .story-progress-bar { position: absolute; top: 12px; left: 16px; right: 16px; height: 3px; background: rgba(255, 255, 255, 0.3); border-radius: 4px; overflow: hidden; }
     .story-progress-fill { width: 0%; height: 100%; background: #fff; transition: width 0.1s linear; }
     .story-img-display { max-width: 100%; max-height: 85vh; object-fit: contain; }
-    .story-close { position: absolute; top: 24px; right: 20px; font-size: 24px; color: #fff; cursor: pointer; z-index: 850; }
-    .music-pill { position: absolute; bottom: 30px; background: rgba(14, 22, 33, 0.85); border: 1px solid var(--glass-border); padding: 8px 18px; border-radius: 30px; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .story-close { position: absolute; top: 24px; right: 20px; font-size: 24px; color: #fff; cursor: pointer; }
+    .music-pill { position: absolute; bottom: 30px; background: rgba(0,0,0,0.7); border: 1px solid #333; padding: 8px 16px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+
+    /* Add Contact Modal */
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 600; align-items: center; justify-content: center; padding: 20px; }
+    .modal-box { background: var(--card-bg); border: 1px solid var(--border-color); width: 100%; max-width: 340px; border-radius: 12px; padding: 20px; text-align: center; }
   </style>
 </head>
 <body>
 
-  <!-- 1. MANDATORY LOGIN GATEWAY (NO ENTRY WITHOUT ACCOUNT) -->
+  <!-- Strict Login Modal -->
   <div class="auth-overlay" id="authScreen">
     <div class="auth-card">
-      <div class="auth-logo"><i class="fa-solid fa-paper-plane"></i></div>
-      <h3 style="margin-bottom: 6px;">Create Account</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Access is restricted. Please register your profile to connect.</p>
+      <div class="auth-logo"><i class="fa-solid fa-lock"></i></div>
+      <h3 style="margin-bottom: 6px;">WhatsApp</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Fast, Simple & Secure Messaging</p>
       
-      <input type="text" id="loginName" class="auth-input" placeholder="Full Name (e.g. Anand)">
+      <input type="text" id="loginName" class="auth-input" placeholder="Aapka Naam">
       <input type="tel" id="loginPhone" class="auth-input" placeholder="Mobile Number (+91...)">
       
       <button class="auth-btn" onclick="submitUserLogin()">
-        <i class="fa-solid fa-user-check"></i> Register & Enter Chat
+        <i class="fa-solid fa-arrow-right"></i> Agree & Continue
       </button>
     </div>
   </div>
 
-  <!-- Header with Share & Add Contact -->
-  <div class="top-bar">
-    <div class="brand-title"><i class="fa-solid fa-paper-plane" style="color: #00d2ff;"></i> Chats</div>
-    <div class="header-icons">
-      <div class="icon-btn" onclick="shareAppInviteLink()" title="Share Invite Link"><i class="fa-solid fa-share-nodes"></i></div>
-      <div class="icon-btn" onclick="openAddFriendModal()" title="Add Contact"><i class="fa-solid fa-user-plus"></i></div>
+  <!-- WhatsApp Top Header -->
+  <div class="wa-header">
+    <div class="wa-title">WhatsApp</div>
+    <div class="wa-actions">
+      <i class="fa-solid fa-user-plus" onclick="openAddFriendModal()" title="Add Contact"></i>
+      <i class="fa-solid fa-ellipsis-vertical" onclick="toggleDropdownMenu()" title="Menu"></i>
+      
+      <!-- 3-Dots Dropdown Menu -->
+      <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-item" onclick="openSettingsTab()"><i class="fa-solid fa-gear"></i> Settings</div>
+      </div>
     </div>
   </div>
 
   <!-- Search -->
-  <div class="search-container">
-    <div class="search-inner">
+  <div class="search-box-wrap">
+    <div class="search-input-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="searchInput" class="search-input" placeholder="Search chats or contacts..." onkeyup="filterUsers()">
+      <input type="text" id="searchInput" placeholder="Search..." onkeyup="filterUsers()">
     </div>
   </div>
 
-  <!-- Stories -->
-  <div class="stories-tray" id="storiesTray">
-    <div class="story-unit" onclick="startStoryProcess()">
-      <div class="story-border add-status"><div class="story-thumb"><i class="fa-solid fa-plus"></i></div></div>
-      <span class="story-name">Add Story</span>
-    </div>
-  </div>
-  <input type="file" id="storyImgInput" accept="image/*" style="display: none;" onchange="handleStoryImgSelected(event)">
-  <input type="file" id="chatMediaInput" accept="image/*,video/*" style="display: none;" onchange="handleChatMediaSelected(event)">
-  <audio id="storyBgMusic" loop></audio>
-
-  <!-- SCREEN 1: CHATS LIST -->
-  <div class="screen active" id="chatsListScreen">
-    <div class="chat-scroll" id="chatListContainer">
-      <!-- Lucky AI Clean Card -->
-      <div class="chat-row" onclick="openDirectChat('Lucky AI', true, '')" data-search="lucky ai bot">
-        <div class="avatar-wrap">
-          <div class="user-avatar" style="background: var(--accent-gradient);"><i class="fa-solid fa-robot"></i></div>
-          <div class="status-dot"></div>
+  <!-- VIEW 1: CHATS TAB -->
+  <div class="view-content active" id="chatsView">
+    <div id="chatListContainer">
+      <!-- Lucky AI Card (Clean Look) -->
+      <div class="chat-row" onclick="openDirectChat('Lucky AI', true, '')" data-search="lucky ai">
+        <div class="avatar-box">
+          <div class="avatar-img" style="background: var(--accent-green);"><i class="fa-solid fa-robot"></i></div>
+          <div class="online-indicator"></div>
         </div>
-        <div class="chat-details">
-          <div class="chat-title-box">
-            <span class="chat-name">Lucky AI <i class="fa-solid fa-circle-check" style="color: var(--accent-cyan); font-size: 13px;"></i></span>
-            <span class="chat-time">Bot</span>
+        <div class="chat-info">
+          <div class="chat-info-top">
+            <span class="chat-name">Lucky AI</span>
+            <span class="chat-time">Online</span>
           </div>
-          <div class="chat-preview">Tap to chat with AI Assistant</div>
+          <div class="chat-subtext">Hey there! How can I help you today?</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SCREEN 2: ACTIVE CONVERSATION SCREEN -->
-  <div class="screen" id="activeChatScreen">
-    <div class="active-chat-header">
-      <div class="header-user-meta">
-        <div class="icon-btn" onclick="backToChatList()"><i class="fa-solid fa-arrow-left"></i></div>
-        <div class="avatar-wrap" style="width: 40px; height: 40px;">
-          <div class="user-avatar" id="currentChatAvatar" style="font-size: 15px;">?</div>
-          <div class="status-dot"></div>
+  <!-- VIEW 2: STATUS TAB -->
+  <div class="view-content" id="statusView">
+    <div class="status-section">
+      <div class="my-status-box" onclick="startStoryProcess()">
+        <div class="status-ring-add"><i class="fa-solid fa-plus"></i></div>
+        <div>
+          <h4 style="font-size: 15px;">My Status</h4>
+          <span style="font-size: 12px; color: var(--text-muted);">Tap to add status update</span>
+        </div>
+      </div>
+
+      <div class="recent-updates-title">Recent Updates</div>
+      <div id="storiesContainer"></div>
+    </div>
+  </div>
+
+  <!-- VIEW 3: CALLS TAB -->
+  <div class="view-content" id="callsView">
+    <div style="padding: 30px 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+      <i class="fa-solid fa-phone" style="font-size: 34px; margin-bottom: 12px; display: block; color: var(--accent-green);"></i>
+      To start a call, select a contact and tap the call button.
+    </div>
+  </div>
+
+  <!-- VIEW 4: SETTINGS TAB -->
+  <div class="view-content" id="settingsView">
+    <div class="settings-profile-card">
+      <div class="settings-avatar" id="settingsUserAvatar">?</div>
+      <div>
+        <h3 id="settingsUserName" style="font-size: 17px; font-weight: 600;">User Name</h3>
+        <p id="settingsUserPhone" style="font-size: 13px; color: var(--text-muted); margin-top: 3px;">+91 0000000000</p>
+      </div>
+    </div>
+
+    <div class="settings-item">
+      <i class="fa-solid fa-key"></i>
+      <div>
+        <div class="settings-item-title">Account</div>
+        <div class="settings-item-sub">Security notifications, change number</div>
+      </div>
+    </div>
+
+    <div class="settings-item">
+      <i class="fa-solid fa-lock"></i>
+      <div>
+        <div class="settings-item-title">Privacy</div>
+        <div class="settings-item-sub">Block contacts, disappearing messages</div>
+      </div>
+    </div>
+
+    <div class="settings-item">
+      <i class="fa-solid fa-message"></i>
+      <div>
+        <div class="settings-item-title">Chats</div>
+        <div class="settings-item-sub">Theme, wallpapers, chat history</div>
+      </div>
+    </div>
+
+    <div class="settings-item">
+      <i class="fa-solid fa-bell"></i>
+      <div>
+        <div class="settings-item-title">Notifications</div>
+        <div class="settings-item-sub">Message, group & call tones</div>
+      </div>
+    </div>
+
+    <div class="settings-item" onclick="shareAppInviteLink()">
+      <i class="fa-solid fa-user-group" style="color: var(--accent-green);"></i>
+      <div>
+        <div class="settings-item-title" style="color: var(--accent-green); font-weight: 600;">Invite a friend</div>
+        <div class="settings-item-sub">Share invite link with contacts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION TABS -->
+  <div class="bottom-nav">
+    <div class="nav-tab active" id="tabChats" onclick="switchNavTab('chatsView', this)">
+      <i class="fa-solid fa-message"></i>
+      <span>Chats</span>
+    </div>
+    <div class="nav-tab" id="tabStatus" onclick="switchNavTab('statusView', this)">
+      <i class="fa-solid fa-circle-notch"></i>
+      <span>Status</span>
+    </div>
+    <div class="nav-tab" id="tabCalls" onclick="switchNavTab('callsView', this)">
+      <i class="fa-solid fa-phone"></i>
+      <span>Calls</span>
+    </div>
+    <div class="nav-tab" id="tabSettings" onclick="switchNavTab('settingsView', this)">
+      <i class="fa-solid fa-gear"></i>
+      <span>Settings</span>
+    </div>
+  </div>
+
+  <input type="file" id="storyImgInput" accept="image/*" style="display: none;" onchange="handleStoryImgSelected(event)">
+  <input type="file" id="chatMediaInput" accept="image/*,video/*" style="display: none;" onchange="handleChatMediaSelected(event)">
+  <audio id="storyBgMusic" loop></audio>
+
+  <!-- FULLSCREEN CHAT SCREEN -->
+  <div class="conversation-screen" id="activeChatScreen">
+    <div class="chat-header-bar">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-arrow-left" style="font-size: 18px; cursor: pointer;" onclick="backToChatList()"></i>
+        <div class="avatar-box" style="width: 38px; height: 38px;">
+          <div class="avatar-img" id="currentChatAvatar" style="font-size: 15px;">?</div>
+          <div class="online-indicator"></div>
         </div>
         <div>
           <h4 id="currentChatName" style="font-size: 15px;">User</h4>
           <span id="currentChatStatus" style="font-size: 11px; color: var(--text-muted);">online</span>
         </div>
       </div>
-      <div class="header-icons">
-        <div class="icon-btn" onclick="sharePersonalChatLink()" title="Share This Chat"><i class="fa-solid fa-link"></i></div>
-        <div class="icon-btn" onclick="requestAndSendLocation()" title="Location"><i class="fa-solid fa-location-dot"></i></div>
-        <div class="icon-btn" onclick="startCallWithPermission('Audio')" title="Call"><i class="fa-solid fa-phone"></i></div>
-        <div class="icon-btn" onclick="startCallWithPermission('Video')" title="Video Call"><i class="fa-solid fa-video"></i></div>
+      <div style="display: flex; gap: 18px; font-size: 17px; color: var(--text-muted);">
+        <i class="fa-solid fa-video" onclick="startCallWithPermission('Video')"></i>
+        <i class="fa-solid fa-phone" onclick="startCallWithPermission('Audio')"></i>
+        <i class="fa-solid fa-location-dot" onclick="requestAndSendLocation()"></i>
       </div>
     </div>
 
-    <div class="chat-messages" id="activeChatBox"></div>
+    <div class="chat-messages-container" id="activeChatBox"></div>
 
     <!-- Sticker Drawer -->
     <div class="sticker-drawer" id="stickerDrawer">
-      <div class="sticker-item" onclick="sendSticker('🔥')">🔥</div>
-      <div class="sticker-item" onclick="sendSticker('👑')">👑</div>
-      <div class="sticker-item" onclick="sendSticker('😎')">😎</div>
-      <div class="sticker-item" onclick="sendSticker('⚡')">⚡</div>
-      <div class="sticker-item" onclick="sendSticker('🎮')">🎮</div>
-      <div class="sticker-item" onclick="sendSticker('❤️')">❤️</div>
-      <div class="sticker-item" onclick="sendSticker('🚀')">🚀</div>
-      <div class="sticker-item" onclick="sendSticker('💯')">💯</div>
+      <div onclick="sendSticker('🔥')">🔥</div>
+      <div onclick="sendSticker('👑')">👑</div>
+      <div onclick="sendSticker('😎')">😎</div>
+      <div onclick="sendSticker('⚡')">⚡</div>
+      <div onclick="sendSticker('🎮')">🎮</div>
+      <div onclick="sendSticker('❤️')">❤️</div>
     </div>
 
-    <!-- Bottom Input Bar -->
-    <div class="chat-input-bar">
-      <div class="icon-btn" onclick="toggleStickers()"><i class="fa-regular fa-face-smile"></i></div>
-      <div class="icon-btn" onclick="document.getElementById('chatMediaInput').click()"><i class="fa-solid fa-paperclip"></i></div>
-      <div class="field-wrap">
-        <input type="text" id="activeMsgInput" class="chat-field" placeholder="Message..." onkeydown="handleInputKey(event)">
-        <div class="view-once-toggle" id="viewOnceBtn" onclick="toggleViewOnce()" title="View Once">①</div>
+    <!-- Input Bar -->
+    <div class="wa-input-bar">
+      <i class="fa-regular fa-face-smile" style="color: var(--text-muted); font-size: 20px; cursor: pointer;" onclick="toggleStickers()"></i>
+      <i class="fa-solid fa-paperclip" style="color: var(--text-muted); font-size: 19px; cursor: pointer;" onclick="document.getElementById('chatMediaInput').click()"></i>
+      <div class="wa-field-box">
+        <input type="text" id="activeMsgInput" placeholder="Message" onkeydown="handleInputKey(event)">
       </div>
-      <button class="send-action" onclick="sendUserMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+      <button class="send-circle-btn" onclick="sendUserMessage()"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </div>
 
-  <!-- Calling Screen -->
+  <!-- Live Calling Overlay -->
   <div class="call-overlay" id="callOverlay">
     <div style="text-align: center;">
-      <div class="call-avatar"><i class="fa-solid fa-user" id="callAvatarIcon"></i></div>
-      <h2 id="callingUserName" style="font-size: 22px;">User</h2>
-      <p id="callingTypeStatus" style="font-size: 13px; color: var(--accent-cyan); margin-top: 6px;">Calling...</p>
+      <div class="avatar-img" style="width: 100px; height: 100px; font-size: 40px; margin: 0 auto 16px; background: var(--accent-green);">
+        <i class="fa-solid fa-user"></i>
+      </div>
+      <h2 id="callingUserName" style="font-size: 20px;">User</h2>
+      <p id="callingTypeStatus" style="font-size: 13px; color: var(--accent-green); margin-top: 6px;">Calling...</p>
     </div>
-    <button class="end-call-btn" onclick="endCurrentCall()"><i class="fa-solid fa-phone-slash"></i></button>
+    <button class="call-end-btn" onclick="endCurrentCall()"><i class="fa-solid fa-phone-slash"></i></button>
   </div>
 
   <!-- Add Contact Modal -->
   <div class="modal-backdrop" id="addFriendModal">
     <div class="modal-box">
       <h3 style="font-size: 16px; margin-bottom: 8px;">New Contact</h3>
-      <input type="text" id="friendNameInput" class="custom-input" placeholder="Name">
-      <input type="tel" id="friendPhoneInput" class="custom-input" placeholder="Phone Number">
-      <button class="btn-submit" onclick="confirmAddFriend()">Add Contact</button>
-      <button class="btn-submit" style="background: transparent; color: var(--text-muted); margin-top: 6px;" onclick="closeAddFriendModal()">Cancel</button>
+      <input type="text" id="friendNameInput" class="auth-input" placeholder="Name">
+      <input type="tel" id="friendPhoneInput" class="auth-input" placeholder="Phone Number">
+      <button class="auth-btn" onclick="confirmAddFriend()">Add Contact</button>
+      <button class="auth-btn" style="background: transparent; color: var(--text-muted); margin-top: 4px;" onclick="closeAddFriendModal()">Cancel</button>
     </div>
   </div>
 
-  <!-- Story Viewer Fullscreen -->
+  <!-- Story Fullscreen -->
   <div class="story-modal" id="storyViewer">
     <div class="story-progress-bar"><div class="story-progress-fill" id="storyProgress"></div></div>
     <i class="fa-solid fa-xmark story-close" onclick="closeStoryViewer()"></i>
@@ -281,48 +384,39 @@
     const GEMINI_API_KEY = "AIzaSyAzX-bCMl3GewqIHUr3gaCQJmchDW0FKs4";
     let currentUser = null;
     let activeChat = null;
-    let isViewOnceActive = false;
     let storyTimer = null;
     let activeMediaStream = null;
 
-    // --- SHARE INVITE & CHAT LINK LOGIC ---
-    function shareAppInviteLink() {
-      if (!currentUser) return;
-      const myPhone = currentUser.phone.replace(/[^0-9]/g, '');
-      const currentUrl = window.location.origin + window.location.pathname;
-      const inviteUrl = `${currentUrl}?invite=${myPhone}&name=${encodeURIComponent(currentUser.name)}`;
+    // --- NAVIGATION TABS ---
+    function switchNavTab(viewId, tabElement) {
+      document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      tabElement.classList.add('active');
+      document.getElementById('dropdownMenu').style.display = 'none';
+    }
 
-      if (navigator.share) {
-        navigator.share({
-          title: "Join me on Lucky Messenger",
-          text: `Hey! Chat with me on Lucky Messenger. Create your profile to start messaging:`,
-          url: inviteUrl
-        }).catch(() => copyFallback(inviteUrl));
-      } else {
-        copyFallback(inviteUrl);
+    function toggleDropdownMenu() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function openSettingsTab() {
+      const settingsTab = document.getElementById('tabSettings');
+      switchNavTab('settingsView', settingsTab);
+    }
+
+    window.addEventListener('click', (e) => {
+      if (!e.target.closest('.wa-actions')) {
+        document.getElementById('dropdownMenu').style.display = 'none';
       }
-    }
+    });
 
-    function sharePersonalChatLink() {
-      if (!activeChat || !currentUser) return;
-      const currentUrl = window.location.origin + window.location.pathname;
-      const link = `${currentUrl}?chatWith=${activeChat.phone || ''}`;
-      copyFallback(link);
-    }
-
-    function copyFallback(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Invite Link Copied to Clipboard! Dosto ko share karein.");
-      }).catch(() => {
-        prompt("Copy this invite link:", text);
-      });
-    }
-
-    // --- STRICT LOGIN GATEWAY ---
+    // --- LOGIN GATEWAY ---
     function submitUserLogin() {
       const name = document.getElementById('loginName').value.trim();
       const phone = document.getElementById('loginPhone').value.trim();
-      if (!name || !phone) return alert("Bina Naam aur Mobile number ke account nahi ban sakta!");
+      if (!name || !phone) return alert("Kripya Naam aur Mobile Number darj karein!");
 
       currentUser = { name, phone };
       localStorage.setItem('lucky_session', JSON.stringify(currentUser));
@@ -335,8 +429,17 @@
       });
 
       document.getElementById('authScreen').style.display = 'none';
-      requestAppPermissionsOnLogin();
+      populateSettingsCard();
+      requestPermissions();
       initAppExperience(true);
+    }
+
+    function populateSettingsCard() {
+      if (currentUser) {
+        document.getElementById('settingsUserName').innerText = currentUser.name;
+        document.getElementById('settingsUserPhone').innerText = currentUser.phone;
+        document.getElementById('settingsUserAvatar').innerText = currentUser.name[0].toUpperCase();
+      }
     }
 
     window.onload = function() {
@@ -344,160 +447,55 @@
       if (session) {
         currentUser = JSON.parse(session);
         document.getElementById('authScreen').style.display = 'none';
+        populateSettingsCard();
         initAppExperience(false);
       } else {
-        // Force login modal to stay visible
         document.getElementById('authScreen').style.display = 'flex';
       }
     };
 
     function initAppExperience(isNewLogin) {
-      initLiveFirebaseListeners();
-      handleInviteUrlParams();
+      initLiveFirebase();
       if (isNewLogin) {
         sendAIWelcomeGreeting();
       }
     }
 
-    // URL Invite Handler (Auto open direct chat if invited)
-    function handleInviteUrlParams() {
-      const params = new URLSearchParams(window.location.search);
-      const invitePhone = params.get('invite');
-      const inviteName = params.get('name');
-
-      if (invitePhone && inviteName && currentUser) {
-        if (invitePhone !== currentUser.phone.replace(/[^0-9]/g, '')) {
-          setTimeout(() => {
-            openDirectChat(decodeURIComponent(inviteName), false, invitePhone);
-          }, 600);
-        }
-      }
-    }
-
-    // Permissions System
-    async function requestAppPermissionsOnLogin() {
-      try {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-          stream.getTracks().forEach(track => track.stop());
-        }
-      } catch (err) {}
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(() => {}, () => {}, { timeout: 4000 });
-      }
-    }
-
-    // Live Calls with Permission
-    async function startCallWithPermission(type) {
-      if (!activeChat) return;
-
-      try {
-        const constraints = (type === 'Video') 
-          ? { audio: true, video: true } 
-          : { audio: true, video: false };
-
-        activeMediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-
-        document.getElementById('callingUserName').innerText = activeChat.name;
-        document.getElementById('callingTypeStatus').innerText = `${type} Call (Connecting...)`;
-        document.getElementById('callAvatarIcon').className = (type === 'Video') ? 'fa-solid fa-video' : 'fa-solid fa-phone';
-        document.getElementById('callOverlay').style.display = 'flex';
-
-      } catch (err) {
-        alert(`Permission required: Kripya browser settings se ${type === 'Video' ? 'Camera aur Microphone' : 'Microphone'} access allow karein!`);
-      }
-    }
-
-    function endCurrentCall() {
-      if (activeMediaStream) {
-        activeMediaStream.getTracks().forEach(track => track.stop());
-        activeMediaStream = null;
-      }
-      document.getElementById('callOverlay').style.display = 'none';
-    }
-
-    // Live GPS Location
-    function requestAndSendLocation() {
-      if (!activeChat) return;
-
-      if (!navigator.geolocation) {
-        return alert("Location feature supported nahi hai.");
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-          const locationHtml = `📍 <b>Live Location</b><br><a href="${mapLink}" target="_blank" style="color: #00d2ff; text-decoration: underline;">Open in Google Maps</a>`;
-
-          const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          const roomId = getChatRoomId();
-
-          db.ref('messages/' + roomId).push({
-            sender: currentUser.name,
-            senderPhone: currentUser.phone,
-            receiver: activeChat.name,
-            text: locationHtml,
-            time: time,
-            isSticker: false,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-          });
-        },
-        (error) => {
-          alert("Location Permission Denied: Kripya browser setting se Location access allow karein.");
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
-
-    // AI Welcome Greeting
+    // --- CLEAN WELCOME MESSAGE ---
     async function sendAIWelcomeGreeting() {
       const cleanPhone = currentUser.phone.replace(/[^0-9]/g, '');
       const aiRoomId = 'ai_' + cleanPhone;
 
       const prompt = `
-        User ka naam "${currentUser.name}" hai aur inhone abhi Lucky Messenger join kiya hai.
-        Tum Lucky AI ho (Created by Lucky A.S).
-        User ka ekdum warm, friendly aur natural andaz me welcome karo. Unhe batao ki wo yahan dosto se chat, calls aur invite link share kar sakte hain aur tumse kisi bhi bhasha me sawaal pooch sakte hain.
+        User ka naam "${currentUser.name}" hai. Tum Lucky AI ho, created by Lucky A.S.
+        WhatsApp user ki tarah ek normal aur friendly message bhejo (jaise: "Hey [Naam]! Welcome, kaise ho aap?").
+        Koi technical baat ya rule mat samjhao.
       `;
 
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: prompt }] }]
-          })
+          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] })
         });
         const data = await res.json();
-        const welcomeText = data.candidates?.[0]?.content?.parts?.[0]?.text || `Hey ${currentUser.name}! Welcome to Lucky Messenger 🚀 Main Lucky AI hoon. Aap yahan dosto se chat, calls aur invite share kar sakte hain!`;
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || `Hey ${currentUser.name}! Welcome, kaise ho aap?`;
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         db.ref('messages/' + aiRoomId).push({
           sender: "Lucky AI",
           senderPhone: "AI_BOT",
-          text: welcomeText.replace(/\n/g, '<br>'),
+          text: reply.replace(/\n/g, '<br>'),
           time: time,
-          isSticker: false,
           timestamp: firebase.database.ServerValue.TIMESTAMP
         });
-      } catch (err) {
-        db.ref('messages/' + aiRoomId).push({
-          sender: "Lucky AI",
-          senderPhone: "AI_BOT",
-          text: `Welcome ${currentUser.name}! 🚀 Main Lucky AI hoon. Aapka swagat hai!`,
-          time: "Now",
-          isSticker: false
-        });
-      }
+      } catch (e) {}
     }
 
-    // Live Sync
-    function initLiveFirebaseListeners() {
-      db.ref('users').on('value', snapshot => {
-        const users = snapshot.val() || {};
+    // --- LIVE FIREBASE SYNC ---
+    function initLiveFirebase() {
+      db.ref('users').on('value', snap => {
+        const users = snap.val() || {};
         const container = document.getElementById('chatListContainer');
         const aiRow = container.firstElementChild;
         container.innerHTML = '';
@@ -511,40 +509,16 @@
         }
       });
 
-      db.ref('stories').on('value', snapshot => {
-        const stories = snapshot.val() || {};
-        const tray = document.getElementById('storiesTray');
-        const addBtn = tray.firstElementChild;
-        tray.innerHTML = '';
-        tray.appendChild(addBtn);
+      db.ref('stories').on('value', snap => {
+        const stories = snap.val() || {};
+        const container = document.getElementById('storiesContainer');
+        container.innerHTML = '';
 
         for (let key in stories) {
           const s = stories[key];
-          renderStoryItem(s.img, s.audioUrl, s.title, s.sender);
+          renderStatusRow(s.img, s.audioUrl, s.title, s.sender);
         }
       });
-    }
-
-    function openDirectChat(name, isAI = false, phone = '') {
-      activeChat = { name, isAI, phone };
-      document.getElementById('chatsListScreen').classList.remove('active');
-      document.getElementById('activeChatScreen').classList.add('active');
-      document.getElementById('currentChatName').innerText = name;
-      document.getElementById('currentChatAvatar').innerText = name[0].toUpperCase();
-      document.getElementById('currentChatStatus').innerText = isAI ? "AI Assistant" : "online";
-      document.getElementById('stickerDrawer').style.display = 'none';
-
-      loadCloudMessages();
-      setTimeout(() => {
-        const field = document.getElementById('activeMsgInput');
-        if (field) field.focus();
-      }, 100);
-    }
-
-    function backToChatList() {
-      document.getElementById('activeChatScreen').classList.remove('active');
-      document.getElementById('chatsListScreen').classList.add('active');
-      activeChat = null;
     }
 
     function renderContactRow(name, phone) {
@@ -554,52 +528,54 @@
       row.setAttribute('data-search', `${name.toLowerCase()} ${phone.toLowerCase()}`);
       row.onclick = () => openDirectChat(name, false, phone);
       row.innerHTML = `
-        <div class="avatar-wrap">
-          <div class="user-avatar">${name[0].toUpperCase()}</div>
-          <div class="status-dot"></div>
+        <div class="avatar-box">
+          <div class="avatar-img">${name[0].toUpperCase()}</div>
+          <div class="online-indicator"></div>
         </div>
-        <div class="chat-details">
-          <div class="chat-title-box">
+        <div class="chat-info">
+          <div class="chat-info-top">
             <span class="chat-name">${name}</span>
             <span class="chat-time">Online</span>
           </div>
-          <div class="chat-preview">Tap to start conversation</div>
+          <div class="chat-subtext">${phone}</div>
         </div>
       `;
       container.appendChild(row);
     }
 
-    function filterUsers() {
-      const query = document.getElementById('searchInput').value.toLowerCase().trim();
-      const items = document.querySelectorAll('.chat-row');
-      items.forEach(item => {
-        const searchData = item.getAttribute('data-search') || '';
-        item.style.display = searchData.includes(query) ? 'flex' : 'none';
-      });
+    function renderStatusRow(imgUrl, audioUrl, songTitle, sender) {
+      const container = document.getElementById('storiesContainer');
+      const row = document.createElement('div');
+      row.className = 'status-row';
+      row.onclick = () => openStoryViewer(imgUrl, audioUrl, songTitle);
+      row.innerHTML = `
+        <div class="status-ring"><img src="${imgUrl}"></div>
+        <div>
+          <h4 style="font-size: 15px;">${sender}</h4>
+          <span style="font-size: 12px; color: var(--text-muted);">${audioUrl ? '🎵 ' + (songTitle || 'Music') : 'Just now'}</span>
+        </div>
+      `;
+      container.appendChild(row);
     }
 
-    function openAddFriendModal() { document.getElementById('addFriendModal').style.display = 'flex'; }
-    function closeAddFriendModal() { document.getElementById('addFriendModal').style.display = 'none'; }
+    // --- CHAT CONVERSATION ---
+    function openDirectChat(name, isAI = false, phone = '') {
+      activeChat = { name, isAI, phone };
+      document.getElementById('activeChatScreen').classList.add('active');
+      document.getElementById('currentChatName').innerText = name;
+      document.getElementById('currentChatAvatar').innerText = name[0].toUpperCase();
+      document.getElementById('currentChatStatus').innerText = "online";
+      document.getElementById('stickerDrawer').style.display = 'none';
 
-    function confirmAddFriend() {
-      const name = document.getElementById('friendNameInput').value.trim();
-      const phone = document.getElementById('friendPhoneInput').value.trim();
-      if (!name || !phone) return alert("Naam aur number dono darj karein!");
-
-      const cleanPhone = phone.replace(/[^0-9]/g, '');
-      db.ref('users/' + cleanPhone).set({
-        name: name,
-        phone: phone,
-        registeredAt: new Date().toISOString()
-      });
-
-      document.getElementById('friendNameInput').value = '';
-      document.getElementById('friendPhoneInput').value = '';
-      closeAddFriendModal();
-      openDirectChat(name, false, phone);
+      loadCloudMessages();
+      setTimeout(() => document.getElementById('activeMsgInput').focus(), 100);
     }
 
-    // Chat Logic
+    function backToChatList() {
+      document.getElementById('activeChatScreen').classList.remove('active');
+      activeChat = null;
+    }
+
     function getChatRoomId() {
       if (activeChat.isAI) return 'ai_' + currentUser.phone.replace(/[^0-9]/g, '');
       const p1 = currentUser.phone.replace(/[^0-9]/g, '');
@@ -611,15 +587,15 @@
       const box = document.getElementById('activeChatBox');
       const roomId = getChatRoomId();
 
-      db.ref('messages/' + roomId).on('value', snapshot => {
+      db.ref('messages/' + roomId).on('value', snap => {
         box.innerHTML = '';
-        const data = snapshot.val() || {};
+        const data = snap.val() || {};
         for (let key in data) {
           const m = data[key];
           const isSent = (m.senderPhone === currentUser.phone);
           const div = document.createElement('div');
-          div.className = `bubble ${isSent ? 'sent' : (m.senderPhone === 'AI_BOT' ? 'ai' : 'received')} ${m.isSticker ? 'sticker-msg' : ''}`;
-          div.innerHTML = `${m.text} <div class="bubble-meta">${m.time}</div>`;
+          div.className = `msg-bubble ${isSent ? 'sent' : (m.senderPhone === 'AI_BOT' ? 'ai' : 'received')} ${m.isSticker ? 'sticker-msg' : ''}`;
+          div.innerHTML = `${m.text} <div class="msg-time-ticks">${m.time} ${isSent ? '<i class="fa-solid fa-check-double blue-tick"></i>' : ''}</div>`;
           box.appendChild(div);
         }
         box.scrollTop = box.scrollHeight;
@@ -647,28 +623,14 @@
         receiver: activeChat.name,
         text: text,
         time: time,
-        isSticker: false,
         timestamp: firebase.database.ServerValue.TIMESTAMP
       });
 
       input.value = '';
-
-      if (activeChat.isAI) {
-        callLuckyAI(text, roomId);
-      }
+      if (activeChat.isAI) callLuckyAI(text, roomId);
     }
 
-    function toggleViewOnce() {
-      isViewOnceActive = !isViewOnceActive;
-      document.getElementById('viewOnceBtn').classList.toggle('active', isViewOnceActive);
-    }
-
-    function toggleStickers() {
-      const drawer = document.getElementById('stickerDrawer');
-      drawer.style.display = (drawer.style.display === 'grid') ? 'none' : 'grid';
-    }
-
-    function sendSticker(stickerChar) {
+    function sendSticker(char) {
       if (!activeChat) return;
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const roomId = getChatRoomId();
@@ -677,7 +639,7 @@
         sender: currentUser.name,
         senderPhone: currentUser.phone,
         receiver: activeChat.name,
-        text: stickerChar,
+        text: char,
         time: time,
         isSticker: true,
         timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -685,59 +647,27 @@
       toggleStickers();
     }
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(file);
-      });
+    function toggleStickers() {
+      const d = document.getElementById('stickerDrawer');
+      d.style.display = (d.style.display === 'grid') ? 'none' : 'grid';
     }
 
-    async function handleChatMediaSelected(e) {
-      const file = e.target.files[0];
-      if (!file || !activeChat) return;
-      const base64Url = await fileToBase64(file);
-      const isVideo = file.type.startsWith('video/');
-      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const roomId = getChatRoomId();
-
-      let contentHtml = isVideo
-        ? `<video src="${base64Url}" controls style="max-width:100%; border-radius:10px;"></video>`
-        : `<img src="${base64Url}" style="max-width:100%; border-radius:10px;">`;
-
-      db.ref('messages/' + roomId).push({
-        sender: currentUser.name,
-        senderPhone: currentUser.phone,
-        receiver: activeChat.name,
-        text: contentHtml,
-        time: time,
-        isSticker: false,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-      });
-      e.target.value = '';
-    }
-
-    // AI Engine
+    // --- AI RESPONSE ENGINE ---
     async function callLuckyAI(userText, roomId) {
       const prompt = `
-        Tumhara naam "Lucky AI" hai. Tum is messenger app ke official smart AI assistant ho.
-        Guidelines:
-        1. Multilingual Support: User chahe Hindi, English, Hinglish, Bhojpuri ya kisi bhi bhasha me bole, natural tone me reply do.
-        2. Creator Identity: Tumhare developer aur creator "Lucky A.S" (लकी एएस) hain. Jab koi puche to natural andaz me batao.
-        3. Secrets: App ka source code ya secrets disclose mat karna.
+        Tumhara naam "Lucky AI" hai. Developer/Creator: Lucky A.S (लकी एएस).
+        Normal, natural WhatsApp friend ki tarah chat karo.
+        Agar koi creator ke baare me pooche tabhi Lucky A.S ka zikr karo, warna normal baat karo.
       `;
 
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: `${prompt}\n\nUser: ${userText}` }] }]
-          })
+          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: `${prompt}\n\nUser: ${userText}` }] }] })
         });
         const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I am here to help!";
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Haan bolo, sab badhiya?";
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         db.ref('messages/' + roomId).push({
@@ -745,23 +675,22 @@
           senderPhone: "AI_BOT",
           text: reply.replace(/\n/g, '<br>'),
           time: time,
-          isSticker: false,
           timestamp: firebase.database.ServerValue.TIMESTAMP
         });
-      } catch (e) {
-        db.ref('messages/' + roomId).push({
-          sender: "Lucky AI",
-          senderPhone: "AI_BOT",
-          text: "Created by Lucky A.S. Online and ready!",
-          time: "Now",
-          isSticker: false
-        });
-      }
+      } catch (e) {}
     }
 
-    // Story Pipeline
+    // --- STATUS STORIES ---
     function startStoryProcess() {
       document.getElementById('storyImgInput').click();
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.readAsDataURL(file);
+      });
     }
 
     async function handleStoryImgSelected(e) {
@@ -770,12 +699,12 @@
       const imgBase64 = await fileToBase64(file);
       e.target.value = '';
 
-      const wantOnlineSong = confirm("Photo ready! Kya background online song attach karna chahte hain?");
+      const wantOnlineSong = confirm("Photo ready! Kya background audio track attach karna hai?");
       let songUrl = null;
       let songTitle = "";
       if (wantOnlineSong) {
-        songUrl = prompt("Online MP3 Audio Link:", "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3");
-        songTitle = prompt("Song Title:", "Soundtrack") || "Track";
+        songUrl = prompt("Audio Link (MP3):", "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3");
+        songTitle = prompt("Song Title:", "Music") || "Music";
       }
 
       db.ref('stories').push({
@@ -787,18 +716,6 @@
       });
     }
 
-    function renderStoryItem(imgUrl, audioUrl, songName, sender) {
-      const tray = document.getElementById('storiesTray');
-      const unit = document.createElement('div');
-      unit.className = 'story-unit';
-      unit.onclick = () => openStoryViewer(imgUrl, audioUrl, songName);
-      unit.innerHTML = `
-        <div class="story-border"><img src="${imgUrl}" class="story-thumb"></div>
-        <span class="story-name">${sender || 'Story'}</span>
-      `;
-      tray.appendChild(unit);
-    }
-
     function openStoryViewer(imgUrl, audioUrl, songName) {
       document.getElementById('storyViewerImg').src = imgUrl;
       const musicTag = document.getElementById('storyMusicTag');
@@ -807,7 +724,7 @@
 
       if (audioUrl) {
         musicTag.style.display = 'flex';
-        document.getElementById('storySongName').innerText = songName || 'Soundtrack';
+        document.getElementById('storySongName').innerText = songName || 'Music';
         audioEl.src = audioUrl;
         audioEl.play().catch(() => {});
       } else {
@@ -836,6 +753,99 @@
       audioEl.pause();
       audioEl.src = '';
       document.getElementById('storyViewer').style.display = 'none';
+    }
+
+    // --- CALLS & LOCATION ---
+    async function requestPermissions() {
+      try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          const s = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+          s.getTracks().forEach(t => t.stop());
+        }
+      } catch (e) {}
+    }
+
+    async function startCallWithPermission(type) {
+      if (!activeChat) return;
+      try {
+        const constraints = (type === 'Video') ? { audio: true, video: true } : { audio: true, video: false };
+        activeMediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        document.getElementById('callingUserName').innerText = activeChat.name;
+        document.getElementById('callingTypeStatus').innerText = `${type} Call (Connecting...)`;
+        document.getElementById('callOverlay').style.display = 'flex';
+      } catch (err) {
+        alert("Microphone/Camera permission allow karein!");
+      }
+    }
+
+    function endCurrentCall() {
+      if (activeMediaStream) {
+        activeMediaStream.getTracks().forEach(t => t.stop());
+        activeMediaStream = null;
+      }
+      document.getElementById('callOverlay').style.display = 'none';
+    }
+
+    function requestAndSendLocation() {
+      if (!activeChat) return;
+      navigator.geolocation.getCurrentPosition(pos => {
+        const mapLink = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const roomId = getChatRoomId();
+
+        db.ref('messages/' + roomId).push({
+          sender: currentUser.name,
+          senderPhone: currentUser.phone,
+          receiver: activeChat.name,
+          text: `📍 <b>Live Location</b><br><a href="${mapLink}" target="_blank" style="color:#53bdeb;">Open Map</a>`,
+          time: time,
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+      }, () => alert("Location permission allow karein."));
+    }
+
+    // --- INVITE A FRIEND ---
+    function shareAppInviteLink() {
+      if (!currentUser) return;
+      const url = window.location.origin + window.location.pathname;
+      const inviteUrl = `${url}?invite=${currentUser.phone.replace(/[^0-9]/g, '')}`;
+
+      if (navigator.share) {
+        navigator.share({ title: "Invite", text: "Chat with me on WhatsApp:", url: inviteUrl });
+      } else {
+        navigator.clipboard.writeText(inviteUrl);
+        alert("Invite link copied to clipboard!");
+      }
+    }
+
+    function openAddFriendModal() { document.getElementById('addFriendModal').style.display = 'flex'; }
+    function closeAddFriendModal() { document.getElementById('addFriendModal').style.display = 'none'; }
+
+    function confirmAddFriend() {
+      const name = document.getElementById('friendNameInput').value.trim();
+      const phone = document.getElementById('friendPhoneInput').value.trim();
+      if (!name || !phone) return alert("Naam aur phone number dono daalein!");
+
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      db.ref('users/' + cleanPhone).set({
+        name: name,
+        phone: phone,
+        registeredAt: new Date().toISOString()
+      });
+
+      document.getElementById('friendNameInput').value = '';
+      document.getElementById('friendPhoneInput').value = '';
+      closeAddFriendModal();
+      openDirectChat(name, false, phone);
+    }
+
+    function filterUsers() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      document.querySelectorAll('.chat-row').forEach(row => {
+        const d = row.getAttribute('data-search') || '';
+        row.style.display = d.includes(q) ? 'flex' : 'none';
+      });
     }
   </script>
 </body>

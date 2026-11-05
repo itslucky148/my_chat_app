@@ -35,9 +35,9 @@
     .auth-input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 10px; color: #fff; margin-top: 10px; outline: none; font-size: 14px; }
     .auth-btn { width: 100%; padding: 13px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; background: var(--accent-gradient); color: #fff; }
 
-    /* Main Header */
-    .app-header { background: var(--panel-header); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-    .app-brand { font-size: 19px; font-weight: 700; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+    /* Header */
+    .app-header { background: var(--panel-header); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .app-brand { font-size: 20px; font-weight: 700; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
     .app-actions { display: flex; gap: 18px; font-size: 18px; color: var(--text-muted); position: relative; }
     .app-actions i { cursor: pointer; }
 
@@ -52,8 +52,12 @@
     .search-box input { border: none; background: transparent; color: #fff; outline: none; width: 100%; font-size: 13px; }
 
     /* Views */
-    .view-content { flex: 1; overflow-y: auto; display: none; }
+    .view-content { flex: 1; overflow-y: auto; display: none; position: relative; }
     .view-content.active { display: block; }
+
+    /* Floating Action Button (FAB - WhatsApp & Telegram Style) */
+    .floating-action-btn { position: fixed; bottom: 76px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent-gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 6px 20px rgba(0, 210, 255, 0.45); cursor: pointer; z-index: 300; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .floating-action-btn:active { transform: scale(0.92); }
 
     /* Chat List */
     .chat-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; }
@@ -143,7 +147,6 @@
   <div class="app-header">
     <div class="app-brand"><i class="fa-solid fa-paper-plane"></i> Lucky OS</div>
     <div class="app-actions">
-      <i class="fa-solid fa-user-plus" onclick="openAddFriendModal()" title="Add Contact"></i>
       <i class="fa-solid fa-ellipsis-vertical" onclick="toggleDropdownMenu()" title="Options"></i>
       
       <div class="dropdown-menu" id="dropdownMenu">
@@ -177,6 +180,11 @@
           <div class="chat-subtext" id="aiPreviewText">Online Assistant • Ask me anything!</div>
         </div>
       </div>
+    </div>
+
+    <!-- WhatsApp & Telegram Style Floating Action Button (FAB) -->
+    <div class="floating-action-btn" id="fabNewChat" onclick="openAddFriendModal()" title="New Chat / Add Contact">
+      <i class="fa-solid fa-comment-medical"></i>
     </div>
   </div>
 
@@ -275,15 +283,16 @@
 
   <!-- Inputs -->
   <input type="file" id="storyImgInput" accept="image/*" style="display: none;" onchange="handleStoryUpload(event)">
-  <input type="file" id="chatMediaInput" accept="image/*" style="display: none;" onchange="handleChatMedia(event)">
+  <input type="file" id="chatMediaInput" accept="image/*,video/*" style="display: none;" onchange="handleChatMedia(event)">
 
-  <!-- Add Friend Modal -->
+  <!-- Add Friend Modal (Floating Action Destination) -->
   <div class="modal-backdrop" id="addFriendModal">
     <div class="modal-box">
-      <h3 style="font-size: 16px; margin-bottom: 12px;">Add New Contact</h3>
+      <h3 style="font-size: 16px; margin-bottom: 6px;">New Contact</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Add phone number to start chatting</p>
       <input type="text" id="friendNameInput" class="auth-input" placeholder="Name">
-      <input type="tel" id="friendPhoneInput" class="auth-input" placeholder="Phone Number">
-      <button class="auth-btn" onclick="confirmAddFriend()">Add Contact</button>
+      <input type="tel" id="friendPhoneInput" class="auth-input" placeholder="Phone Number (+91...)">
+      <button class="auth-btn" onclick="confirmAddFriend()">Start Chat</button>
       <button class="auth-btn" style="background: transparent; color: var(--text-muted); margin-top: 4px;" onclick="closeAddFriendModal()">Cancel</button>
     </div>
   </div>
@@ -324,15 +333,13 @@
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
     } catch(e) {
-      console.log("Firebase init fallback:", e);
+      console.log("Firebase fallback:", e);
     }
 
     const GEMINI_API_KEY = "AIzaSyAzX-bCMl3GewqIHUr3gaCQJmchDW0FKs4";
     let currentUser = null;
     let activeChat = null;
     let localChatHistory = {}; 
-    let localContacts = [];
-    let localStories = [];
 
     // --- NAVIGATION ---
     function switchNavTab(viewId, tabElement) {
@@ -341,6 +348,12 @@
       document.getElementById(viewId).classList.add('active');
       tabElement.classList.add('active');
       document.getElementById('dropdownMenu').style.display = 'none';
+
+      // Floating button visibility
+      const fab = document.getElementById('fabNewChat');
+      if (fab) {
+        fab.style.display = (viewId === 'chatsView') ? 'flex' : 'none';
+      }
     }
 
     function toggleDropdownMenu() {
@@ -394,7 +407,7 @@
 
     // --- AI WELCOME ---
     async function sendAIWelcome() {
-      const welcomeText = `Hey ${currentUser.name}! Welcome to Lucky OS 🚀 Main Lucky AI hoon. Aap yahan mujhse ya apne dosto se real-time baat kar sakte hain!`;
+      const welcomeText = `Hey ${currentUser.name}! Welcome to Lucky OS 🚀 Main Lucky AI hoon. Aap yahan mujhse ya dosto se direct baat kar sakte hain!`;
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       
       appendMessageToUI({
@@ -470,12 +483,10 @@
 
       const roomId = getChatRoomId();
       
-      // Load from local memory first
       if (localChatHistory[roomId]) {
         localChatHistory[roomId].forEach(m => renderBubble(m));
       }
 
-      // Load from Firebase
       if (db) {
         db.ref('messages/' + roomId).once('value', snap => {
           const data = snap.val() || {};
@@ -545,16 +556,13 @@
         time: time
       };
 
-      // 1. Instant Render on Screen
       appendMessageToUI(msgObj, roomId);
       input.value = '';
 
-      // 2. Firebase Push
       if (db) {
         db.ref('messages/' + roomId).push(msgObj);
       }
 
-      // 3. AI Trigger
       if (activeChat.isAI) {
         callAI(text, roomId);
       }
@@ -591,7 +599,7 @@
         const fallbackMsg = {
           sender: "Lucky AI",
           senderPhone: "BOT",
-          text: "Lucky OS connected hai! Puchho kya janna hai?",
+          text: "Lucky OS online hai! Puchho kya janna hai?",
           time: botTime
         };
         appendMessageToUI(fallbackMsg, roomId);
@@ -623,7 +631,7 @@
       e.target.value = '';
     }
 
-    // --- ADD CONTACT ---
+    // --- ADD CONTACT (FLOW VIA FAB) ---
     function openAddFriendModal() { document.getElementById('addFriendModal').style.display = 'flex'; }
     function closeAddFriendModal() { document.getElementById('addFriendModal').style.display = 'none'; }
 
